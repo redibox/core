@@ -1,6 +1,6 @@
 # RediBox
 
-![Coverage](https://img.shields.io/coveralls/redibox/core.svg)
+[![Coverage Status](https://coveralls.io/repos/github/redibox/core/badge.svg?branch=master)](https://coveralls.io/github/redibox/core?branch=master)
 ![Downloads](https://img.shields.io/npm/dt/redibox.svg)
 ![npm version](https://img.shields.io/npm/v/redibox.svg)
 ![dependencies](https://img.shields.io/david/redibox/core.svg)
