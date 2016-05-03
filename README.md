@@ -191,7 +191,7 @@ Returns 'false' if not found.
 
 
 
-## Subscriptions / PUBSUB
+## PubSub
 
 RediBox core PUBSUB is more than just the standard ioredis/node_redis clients single 'message' event handler. It's setup to allow subscribing just like you would with a node event emitter. Internally though, RediBox has a on 'message' handler that routes pubsub messages to an event emitter which you're listening to when you subscribe, this gives you better control over channel flow.
 
