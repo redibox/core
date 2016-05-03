@@ -48,6 +48,10 @@ RediBox.on('error' error => {
 });
 ```
 
+## Configuration
+
+See the [default config](https://github.com/redibox/core/blob/master/src/defaults.js) for all available configuration options.
+
 
 ## Core
 
@@ -60,8 +64,12 @@ Force Disconnects, will not wait for pending replies (use disconnect if you need
 #### - getReadOnlyClient -
 Returns a redis client for read only purposes. This is useful for cluster mode where `redis.clusterScaleReads` is set to `true`. This client is able to read from redis cluster slaves.
 
+**Returns**: `RedisClient` , IORedis master and slave read client.
+
 #### - getClient -
 Returns a read/write redis client.
+
+**Returns**: `RedisClient` , IORedis master read and write client.
 
 #### - createClient -
 Creates a new redis client using the current config and attaches it onto `RediBox.clients.clientName`
@@ -72,7 +80,7 @@ Creates a new redis client using the current config and attaches it onto `RediBo
  - **readyCallback**: `Function` , callback on `ready` event.
 
 
-**Returns**: `RedisClient` , the new IORedis client. 
+**Returns**: `RedisClient` , the new IORedis client.
 
 
 #### - isClientConnected -
@@ -81,13 +89,25 @@ Returns the connection state of the redis client provided.
 **Parameters:**
  - **client**: `RedisClient` , the redis client instance to check.
 
-**Returns**: `Boolean`
+**Returns**: `Boolean` , true if connected.
 
 
 ## Cluster
 
 #### - clusterExec -
 #### - clusterGetNodes -
+Returns an array of all master and slave node addresses that we are connected to.
+
+**Returns**: `Array<String>`
+
+**Example**:
+```javascript
+console.dir(RediBox.clusterGetNodes());
+
+// logs:
+// ['127.0.0.1:6379`]
+```
+
 #### - clusterGetSlaves -
 #### - clusterGetMasters -
 #### - clusterGetNodeClient -

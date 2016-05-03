@@ -69,7 +69,7 @@ class RediBox {
     this.id = cuid();
 
     // keep a timestamp of when we started
-    this.boot_timestamp = Date.now();
+    this.bootedAtTimestamp = Date.now();
 
     this.commands = {};
 
@@ -140,6 +140,7 @@ class RediBox {
     process.once('SIGTERM', ::this.quit);
     process.once('SIGINT', ::this.quit);
 
+    return this;
     // TODO experimental poop
     // return new Proxy(this, {
     //   get: (target, prop) => {
@@ -259,7 +260,7 @@ class RediBox {
         pid: process.pid,
         title: process.title,
         uptime: process.uptime(),
-        boot_time: this.boot_timestamp,
+        boot_time: this.bootedAtTimestamp,
         hostname: HOST_NAME,
       },
 
