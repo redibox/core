@@ -1,6 +1,6 @@
 # RediBox
 
-![Coverage](https://img.shields.io/coveralls/salakar/redibox.svg)
+![Coverage](https://img.shields.io/coveralls/redibox/core.svg)
 ![Downloads](https://img.shields.io/npm/dm/redibox.svg)
 ![Downloads](https://img.shields.io/npm/dt/redibox.svg)
 ![npm version](https://img.shields.io/npm/v/redibox.svg)
