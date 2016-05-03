@@ -208,12 +208,12 @@ class RediBox {
    * @private
    * @param clientName client name, this is also the property name on
    * @param readOnly
-   * @param reportReady
+   * @param readyCallback
    */
-  createClient(clientName, readOnly, reportReady = noop) {
+  createClient(clientName, readOnly, readyCallback = noop) {
     /* eslint no-param-reassign:0 */
     if (isFunction(readOnly)) {
-      reportReady = readOnly;
+      readyCallback = readOnly;
       readOnly = false;
     }
 
@@ -243,7 +243,7 @@ class RediBox {
       this.log.verbose(
         `${readOnly ? 'Read only' : 'Read/write'} redis client '${clientName}' is ready!`
       );
-      return reportReady();
+      return readyCallback();
     });
   }
 

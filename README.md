@@ -63,11 +63,23 @@ Returns a redis client for read only purposes. This is useful for cluster mode w
 #### - getClient -
 Returns a read/write redis client.
 
+#### - createClient -
+Creates a new redis client using the current config and attaches it onto `RediBox.clients.clientName`
+
+**Parameters**:
+ - **clientName**: `String` , the key to use for the client, at `RediBox.clients`.
+ - **readOnly**: `Boolean` , set to true to make this a `READONLY` redis client that will allow reading from masters AND slaves.
+ - **readyCallback**: `Function` , callback on `ready` event.
+
+
+**Returns**: `RedisClient` , the new IORedis client. 
+
+
 #### - isClientConnected -
 Returns the connection state of the redis client provided.
 
 **Parameters:**
- - **client**: `Client instnace` , the redis client instance to check.
+ - **client**: `RedisClient` , the redis client instance to check.
 
 **Returns**: `Boolean`
 
