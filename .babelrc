@@ -1,18 +1,10 @@
 {
-  "presets": ["es2015-node6"],
   "plugins": [
-    ["typecheck", {
-      "disable": {
-        "production": true
-      }
-    }],
-    "syntax-flow",
     "transform-flow-strip-types",
-    "transform-object-rest-spread",
-    "syntax-function-bind",
-    "transform-function-bind",
-    "syntax-class-properties",
-    "transform-class-properties",
     "add-module-exports"
+  ],
+  "presets": [
+    "es2015",
+    "stage-0"
   ]
 }

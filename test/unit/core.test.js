@@ -32,10 +32,16 @@ describe('core', () => {
   it('Should subscribeOnce and publish events from multiple channels', function testB(done) {
     this.timeout(9000);
     const redibox = new RediBox();
+
+    redibox.on('error', (error) => {
+      console.dir(error);
+    });
+
     const done3 = after(3, () => {
-      redibox.quit();
+      redibox.disconnect();
       done();
     });
+
     redibox.once('ready', () => {
       redibox.subscribeOnce([
         'requestID-123456:request:dataPart1',
@@ -62,20 +68,32 @@ describe('core', () => {
 
   it('Should subscribe and publish events from multiple channels many times', function testB(done) {
     this.timeout(9000);
+    let listener;
+
     const redibox = new RediBox({ logRedisErrors: true });
+
     const done10 = after(10, () => {
-      redibox.quit();
-      done();
+      redibox.unsubscribe([
+        'requestID-123456:request:dataPart1',
+        'requestID-123456:request:dataPart2',
+        'requestID-123456:request:dataPart3',
+      ], listener, () => {
+        redibox.disconnect();
+        done();
+      });
     });
+
+    listener = message => { // on message received listener
+      assert.isUndefined(message.timeout);
+      done10();
+    };
+
     redibox.once('ready', () => {
       redibox.subscribe([
         'requestID-123456:request:dataPart1',
         'requestID-123456:request:dataPart2',
         'requestID-123456:request:dataPart3',
-      ], message => { // on message received listener
-        assert.isUndefined(message.timeout);
-        done10();
-      }, error => { // on subscribed callback
+      ], listener, error => { // on subscribed callback
         assert.isNull(error);
 
         redibox.publish([

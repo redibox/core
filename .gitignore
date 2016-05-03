@@ -36,3 +36,5 @@ lib
 nbproject
 .idea
 .node_history
+test.js
+benchmark

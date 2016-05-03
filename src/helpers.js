@@ -26,10 +26,9 @@
 
 import { Logger, transports } from 'winston';
 import { createHash } from 'crypto';
-import babylon from 'babylon';
 
 /**
- * Generates from sha1 sum from a js object.
+ * Generates from sha1 sum from an object.
  * @param data
  * @returns {*}
  */
@@ -68,7 +67,7 @@ export function throttle(func, limit) {
 }
 
 /**
- *
+ * Deep get a nested property from an object using a dot notation path
  * @param obj
  * @param path
  * @returns {*}
@@ -211,76 +210,4 @@ export function mergeDeep(target, source) {
     });
   }
   return target;
-}
-
-/**
- * Extract the body and param names from a user provided function.
- * @param functionSource
- * @param indent
- * @returns {*}
- */
-export function stringifyFunctionBody(functionSource, indent) {
-  if (!isFunction(functionSource)) {
-    return null;
-  }
-
-  let body = '';
-  const params = [];
-  const functionString = functionSource.toString();
-
-  let functionNode = babylon.parse(
-    functionString,
-    {
-      plugins: [
-        'jsx',
-        'asyncFunctions',
-        'objectRestSpread',
-        'trailingFunctionCommas',
-      ],
-    }
-  );
-
-  if (!functionNode.program || !!functionNode.program.body[0]) {
-    return null;
-  }
-
-  // retrieve first child node
-  functionNode = functionNode.program.body[0];
-
-  // Use the expression as the source if it's an expression
-  if (functionNode.type === 'ExpressionStatement') {
-    functionNode = functionNode.expression;
-  }
-
-  // extract param names
-  if (functionSource.length && functionNode.params && functionNode.params.length) {
-    functionNode.params.forEach(param => params.push(param.name));
-  }
-
-  // extract raw function body
-  if (functionNode.body.type === 'BlockStatement') {
-    // it's a block statement so drop off the enclosing curly braces
-    body = functionString.substr(
-      functionNode.body.start + 1,
-      (functionNode.body.end - functionNode.body.start) - 2
-    );
-  } else {
-    body = functionString.substr(functionNode.body.start, functionNode.body.end);
-  }
-
-  return {
-    body: !indent ? body : body.replace(/\n/g, `\n${' '.repeat(indent)}`),
-    parameters: params,
-  };
-}
-
-/**
- * Convert a function string to a executable js function with custom params.
- * @param parameters
- * @param functionBody
- * @returns {*}
- */
-export function toFunction(parameters, functionBody) {
-  /* eslint no-new-func:0 */
-  return Function(parameters, functionBody);
 }

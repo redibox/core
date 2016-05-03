@@ -8,22 +8,14 @@
 ![dev dependencies](https://img.shields.io/david/dev/salakar/redibox.svg)
 ![License](https://img.shields.io/npm/l/redibox.svg)
 
-Ultimate redis toolbox for node. Built using ES6/ES7 features and as lightweight as possible with minimal dependencies.
+Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis).
 
 ## What can you do with RediBox?
 
-RediBox offers out of the box support for many of the common Redis [use cases](#use-cases-and-modules). Not only that,
-it also provides easy wrappers / utilities around redis client connection monitoring, scaling cluster reads with [`READONLY`](http://redis.io/commands/readonly)
-and error handling.
-
-**Currently available features:**
- - **[Caching](/src/modules/cache/README.md)**, including easy wrapper helpers, e.g `wrapPromise`, `wrapWaterlineQuery` (for sails), `wrapExpressRequest`
- - **Queues** and **jobs**. Lightweight polling free design with variable concurrency per queue and live progress tracking from any server (pubsubbed). Additionally you can create relay jobs that run multiple child jobs which relay resolved data to the next job in the chain.
- - **Redis Clusters** with optional cluster scaled slave reads.
- - **Advanced** Redis **PUBSUB** helpers such as `subscribeOnce` and `subscribeOnceOf` with a timeout.
- - Custom **LUA Commands** bootstrapping.
-
-To see docs for each of the individual features see the [use cases](#use-cases-and-modules) section.
+RediBox offers out of the box support for clusters, sentinels and standalone redis servers. It also
+provides easy utilities around redis client connection monitoring, scaling cluster
+reads with [`READONLY`](http://redis.io/commands/readonly), advanced subscriptions via PUBSUB (in the
+easy to use node.js Event Emitter format), lua script management and executing commands against a cluster.
 
 ## Getting Started
 
@@ -38,79 +30,70 @@ And include in your project:
 ```javascript
 // ES6
 import Redibox from 'redibox';
+
 const RediBox = new Redibox({
   redis: {
     port: 7777
   }
 }); // optional callback for bootstrap ready status or use events:
 
-RediBox.on('ready' function(clientStatus) {
-  rediBox.log.info(error); // internal redibox instance of winston if needed.
+RediBox.on('ready' clientStatus => {
+  RediBox.log.info(error); // internal redibox instance of winston if needed.
   // use cache module to set a cached value with a 60 second validity time.
-  rediBox.cache.set('myKey', 'myVal', 60); // use a callback or a promise
+  RediBox.cache.set('myKey', 'myVal', 60); // use a callback or a promise
 });
 
-RediBox.on('error' function(error) {
-  rediBox.log.error(error); // internal redibox instance of winston if needed.
+RediBox.on('error' error => {
+  RediBox.log.error(error); // internal redibox instance of winston if needed.
 });
 ```
 
 
-## RediBox Core
+## Core
 
-Provides the core set of utilities used by all plugins and can also be used in your own code, things such as creating a pre-configured error handled client and advanced PUBSUB.
+#### - quit -
+Disconnects the redis clients but first waits for pending replies.
 
-For example, you can easily get a connected client to run your own redis commands:
+#### - disconnect -
+Force Disconnects, will not wait for pending replies (use disconnect if you need to wait).
 
-```javascript
-// ...
-// init your RediBox instance here and check boot ready
-// state / events here (as demonstrated in the previous example)
-// ...
-
-// get a client and run any redis commands you want on it.
-RediBox.getClient().hgetall(...); // callback or promise
-
-// alternatively if you're using a redis cluster and have set `redis.clusterScaleReads` to true
-// then you can also use this to get a client for read only purposes that will read from
-// your cluster slaves.
-const RedisReadOnlyClient = RediBox.getReadOnlyClient();
-
-RedisReadOnlyClient.hget(....); // callback or promise
-
-// This will error though as you cannot issue a `write` command to a read only instance.
-RedisReadOnlyClient.hset(....); // callback or promise
-```
-
-#### RediBox.quit();
-Force close all redis client connections without waiting for any pending replies.
-
-#### RediBox.disconnect();
-Close all redis client connections but wait for any pending replies first.
-
-#### RediBox.getReadOnlyClient();
+#### - getReadOnlyClient -
 Returns a redis client for read only purposes. This is useful for cluster mode where `redis.clusterScaleReads` is set to `true`. This client is able to read from redis cluster slaves.
 
-#### RediBox.getClient();
+#### - getClient -
 Returns a read/write redis client.
 
-#### static RediBox.isClientConnected(client);
+#### - isClientConnected -
 Returns the connection state of the redis client provided.
 
-## RediBox Core PUBSUB
+**Parameters:**
+ - **client**: `Client instnace` , the redis client instance to check.
+
+**Returns**: `Boolean`
+
+
+## Cluster
+
+
+## Subscriptions / PUBSUB
 
 RediBox core PUBSUB is more than just the standard ioredis/node_redis clients single 'message' event handler. It's setup to allow subscribing just like you would with a node event emitter. Internally though, RediBox has a on 'message' handler that routes pubsub messages to an event emitter which you're listening to when you subscribe, this gives you better control over channel flow.
 
-### Methods
-
-
-#### RediBox.subscribeOnce(channels: string|Array, listener, subscribedCallback, [Optional] timeout);
-
-Subscribe once to single or multiple redis channels, i.e the same as node's EventEmitter.once(). On receiving the first event the client will automatically unsub (if no other subscribers) and remove your listener from the emitter. Cool huh? 'But wait, there is more!' - Not only can you subscribe for one event only, you can do so with a timeout also, i.e. I want one event from this channel within **5000 ms**, else let me know it timed out.
+#### - subscribeOnce -
+Subscribe once to single or multiple redis channels, i.e the same as node's EventEmitter.once(). On
+receiving the first event per channel the client will automatically unsub (if no other subscribers)
+and remove the listener from the emitter.
+Optionally you can also specify a timeout, e.g. I want one event from this channel within **5000 ms**, else let me know it timed out.
 
 This accepts a single channel as a string or multiple channels as an Array.
 
-Here's an advanced example with multiple channels and  timeout:
+**Parameters:**
+ - **channels**: `String || Array` , A string or array of strings of channels to subscribe to.
+ - **listener**: `Function` , Your event listener.
+ - **subscribedCallback**: `Function` , callback to be called once subscribed, first param is an error.
+ - **timeout**: `Number` , **Optional** timeout ms - timeout after specified length of time, listener is called with a timeout event (`event.timeout`).
+
+**Example:**
 ```javascript
   RediBox.subscribeOnce([
     'requestID-123456:request:dataPart1',
@@ -122,7 +105,7 @@ Here's an advanced example with multiple channels and  timeout:
     }
     console.log('I received a message \\o/:');
     console.dir(message.channel); // channel name
-    console.dir(message.timestamp); // when the message wa received
+    console.dir(message.timestamp); // when the message was received
     console.dir(message.data); // JSON parsed data
   }, function (err) { // on subscribed callback
     if (!err) {
@@ -147,18 +130,67 @@ Here's an advanced example with multiple channels and  timeout:
   { someArray: [ 1, 2, 3, 4, 5 ], somethingElse: 'foobar' }
   [Error: Sub once to channel requestID-123456:request:dataPart2 timed out! =( ]
   [Error: Sub once to channel requestID-123456:request:dataPart3 timed out! =( ]
-
   */
-
 ```
 
+#### - subscribeOnceOf -
+Subscribe to all of the channels provided but as soon as the first message is received from any
+channel then unsubscribe from all the provided channels.
 
+This accepts a single channel as a string or multiple channels as an Array.
 
-#### RediBox.subscribe(channels: string|Array, listener, subscribedCallback);
+**Parameters:**
+ - **channels**: `String || Array` , A string or array of strings of channels to subscribe to.
+ - **listener**: `Function` , Your event listener.
+ - **subscribedCallback**: `Function` , callback to be called once subscribed, first param is an error.
+ - **timeout**: `Number` , **Optional** timeout ms - timeout after specified length of time, listener is called with a timeout event (`event.timeout`).
 
+**Example:**
+```javascript
+  RediBox.subscribeOnceOf([
+    'requestID-123456:request:success',
+    'requestID-123456:request:error', // not sure why you'd do this, but you get the idea
+  ], function (message) { // on message received listener
+    if (message.timeout) {
+      return console.error(new Error(`Sub once of channel ${message.channel} timed out! =( `));
+    }
+    console.log('I received a message \\o/:');
+    // insert success kid meme
+    console.dir(message.channel); // channel name
+    console.dir(message.timestamp); // when the message was received
+    console.dir(message.data); // JSON parsed data
+  }, function (err) { // on subscribed callback
+    if (!err) {
+      console.log('Subscribed once of multiple channels!');
+
+      // test publish to just one channel, the rest will unsub after receiving this
+      RediBox.publish('requestID-123456:request:success', {
+        someArray: [1, 2, 3, 4, 5],
+        somethingElse: 'foobar'
+      });
+    }
+  }, 3000); // I want an event back within 3 seconds for any channel before they all timeout
+
+  /**
+  CONSOLE OUTPUT:
+
+  Subscribed once of multiple channels!
+  I received a message \o/:
+  'requestID-123456:request:success'
+  1453677089
+  { someArray: [ 1, 2, 3, 4, 5 ], somethingElse: 'foobar' }
+  */
+```
+
+#### - subscribe -
 Equivalent to node's EventEmiiter.on() with an optional **subscribedCallback** to let you know when subscribed. This accepts a single channel as a string or multiple channels as an Array.
 
-Example:
+**Parameters:**
+ - **channels**: `String || Array` , A string or array of strings of channels to subscribe to.
+ - **listener**: `Function` , Your event listener.
+ - **subscribedCallback**: `Function` , callback to be called once subscribed, first param is an error.
+
+**Example:**
 ```javascript
   RediBox.subscribe('getMeSomeDataMrWorkerServer', function (message) { // your listener
     console.log('I received a message \\o/:');
@@ -189,10 +221,15 @@ Example:
 
 
 
-#### RediBox.unsubscribe(channels: string|Array, [Optional] listener, [Optional] unsubscribedCallback);
-
+#### - unsubscribe -
 Unsubscribe from single or multiple channels. Note that even though listener is optional, you should pass the original listener function that you provided when you subscribed to those channels - if available (see example below).
 
+**Parameters:**
+ - **channels**: `String || Array` , A string or array of strings of channels to unsubscribe from.
+ - **listener**: `Function` , **Optional** event listener.
+ - **unsubscribedCallback**: `Function` , **Optional** callback to be called once unsubscribed, first param is an error.
+
+**Example:**
 ```javascript
   // your on message received listener
   const myListener = function (message) {
@@ -215,50 +252,51 @@ Unsubscribe from single or multiple channels. Note that even though listener is 
 
     HELLO
   */
-
 ```
 
-
-
-
-#### RediBox.publish(channels: string|Array, message, [Optional] publishedCallback);
-
+#### - publish -
 Publishes a message to single or multiple channels. Non string values automatically get JSON stringified.
 
+**Parameters:**
+ - **channels**: `String || Array` , A string or array of strings of channels to publish to.
+ - **message**: `String || Object` , **Optional** event listener.
+ - **publishedCallback**: `Function` , **Optional** callback to be called once published, first param is an error.
+
+**Example:**
 ```javascript
   RediBox.publish('someChannel', 'HELLO');
+
   // or with objects:
   RediBox.publish('someChannel', {
     foo: 'bar'
   });
 ```
 
-## Use Cases and Modules
+## RediBox Modules
 
- - [Cache](/src/modules/cache/README.md)
+Redibox also has plenty of add-on modules to support many of the common Redis use cases.
 
+ - [Cache](https://github.com/redibox/cache)
+ - [Job](https://github.com/redibox/job)
+ - [Schedule](https://github.com/redibox/schedule)
+ - [Lock](https://github.com/redibox/lock)
+ - [IPC](https://github.com/redibox/ipc)
+ - [Throttle](https://github.com/redibox/throttle)
 
+If you want to publish your own module and list it here just follow the general setup/structure of
+the default modules above, publish it and submit a PR to list it on the readme.
 
-## Upcoming Features / TODO
- - **Distributed Locks** using the [Redlock](http://redis.io/topics/distlock) algorithm to `acquire`, `release` and `renew` locks. (base module already setup)
- - **Throttling**, limit something to X times per Y time period with one easy call, for example: api requests. (base module already setup)
- - **Time Series** want pretty stats and graphs? This will generate hits and allow easy querying of data with timestamp based range filtering. (base module already setup)
- - **Indexes** - http://redis.io/topics/indexes wrappers to aid using redis as a secondary index. (base module already setup)
- - Allow userland to load in their own modules via the module loader.
-
+*TODO: RediBox Module template / example repo.*
 
 ## Contributing
 
 Full contributing guidelines are to be written, however please ensure you follow these points when sending in PRs:
 
 - Ensure no lint warnings occur via `npm run lint`.
-- Implement tests for new features / functionality (I'm guilty of not doing this at the moment)
+- Implement tests for new features / functionality.
+- Ensure coverage remains above 90% and does not decrease.
 - Use verbose logging throughout for ease of debugging issues, see core.js for example.
-- New modules should follow the same format as the others, these get magically bootstrapped by the loader.
-
-To add custom lua scripts to the modules simply create a `scripts.js` file (see the Cache module one for the layout) in the root of the module, the module loader will automatically define the commands on the clients, neat!
-
-If you're creating a fresh module that's not in the todo list above, the simple copy one of the other modules and away you go, simples!
+- New modules should follow the same format as the default modules / template.
 
 **Note:** For debugging purposes you may want to enable verbose logging via the config:
 
