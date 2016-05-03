@@ -3,7 +3,7 @@ sudo: false
 language: node_js
 
 node_js:
-  - "4"
+  - "4.3"
   - "5"
   - "6"
 
@@ -12,6 +12,3 @@ services:
 
 install: make travis-install
 script: make travis-run
-
-after_success:
-  - coveralls

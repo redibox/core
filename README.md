@@ -1,11 +1,9 @@
 # RediBox
 
 ![Coverage](https://img.shields.io/coveralls/redibox/core.svg)
-![Downloads](https://img.shields.io/npm/dm/redibox.svg)
 ![Downloads](https://img.shields.io/npm/dt/redibox.svg)
 ![npm version](https://img.shields.io/npm/v/redibox.svg)
 ![dependencies](https://img.shields.io/david/salakar/redibox.svg)
-![dev dependencies](https://img.shields.io/david/dev/salakar/redibox.svg)
 ![License](https://img.shields.io/npm/l/redibox.svg)
 
 Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis).

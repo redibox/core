@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "main": "lib/index.js",
   "author": "Mike Diarmid",
+  "repository": "redibox/core",
   "license": "MIT",
   "engines": {
     "node": ">=4.3"

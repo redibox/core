@@ -125,6 +125,8 @@ travis-run:
 	#########
 	npm install
 	npm run prepublish
+	npm run test
+	npm run coveralls
 
 	# Kill all redis nodes and do cleanup
 	make stop
