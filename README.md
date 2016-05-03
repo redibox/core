@@ -74,6 +74,13 @@ Returns the connection state of the redis client provided.
 
 ## Cluster
 
+#### - clusterExec -
+#### - clusterGetNodes -
+#### - clusterGetSlaves -
+#### - clusterGetMasters -
+#### - clusterGetNodeClient -
+#### - clusterCanScaleReads -
+
 
 ## Subscriptions / PUBSUB
 

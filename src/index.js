@@ -140,14 +140,15 @@ class RediBox {
     process.once('SIGTERM', ::this.quit);
     process.once('SIGINT', ::this.quit);
 
-    return new Proxy(this, {
-      get: (target, prop) => {
-        if (this[prop]) return this[prop];
-        if (this.commands[prop]) return this.commands[prop];
-        if (this.clients[prop]) return this.clients[prop];
-        return undefined;
-      },
-    });
+    // TODO experimental poop
+    // return new Proxy(this, {
+    //   get: (target, prop) => {
+    //     if (this[prop]) return this[prop];
+    //     if (this.commands[prop]) return this.commands[prop];
+    //     if (this.clients[prop]) return this.clients[prop];
+    //     return undefined;
+    //   },
+    // });
   }
 
   /**
