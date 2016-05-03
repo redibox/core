@@ -12,3 +12,6 @@ services:
 
 install: make travis-install
 script: make travis-run
+
+after_success:
+  - coveralls
