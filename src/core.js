@@ -77,7 +77,7 @@ export default class RediBox extends EventEmitter {
     this.options = mergeDeep(defaults(), this.options);
 
     // detect if we're a cluster
-    this.options.redis.cluster = !!this.options.redis.hosts && this.options.redis.hosts.length;
+    this.options.redis.cluster = !!this.options.redis.hosts && this.options.redis.hosts.length > 0;
 
     // setup new logger
     this.log = createLogger(this.options.log);
