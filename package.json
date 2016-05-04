@@ -30,7 +30,7 @@
     "ioredis"
   ],
   "scripts": {
-    "build": "npm run buildX &&  npm run build4 && npm run build5 && npm run build6 && cp lib/x/index.js lib",
+    "build": "npm run buildX &&  npm run build4 && npm run build5 && npm run build6 && cp lib/X/index.js lib",
     "buildX": "babel src --babelrc=false --presets es2015,stage-0 --plugins add-module-exports --out-dir lib/X",
     "build4": "babel src --babelrc=false --presets es2015-node4,stage-0 --plugins add-module-exports --out-dir lib/4",
     "build5": "babel src --babelrc=false --presets es2015-node5,stage-0 --plugins add-module-exports --out-dir lib/5",

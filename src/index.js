@@ -11,5 +11,5 @@ switch (process.version.substr(0, 2)) {
     module.exports = require('./6/core');
     break;
   default:
-    module.exports = require('./core');
+    module.exports = require('./X/core');
 }
