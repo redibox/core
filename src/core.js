@@ -25,14 +25,12 @@
  */
 
 import { hostname } from 'os';
-import { inherits } from 'util';
-
 import cuid from 'cuid';
 import Redis from 'ioredis';
 import each from 'async/each';
 import Promise from 'bluebird';
 import EventEmitter from 'eventemitter3';
-
+import defaults from './defaults';
 import {
   after,
   mergeDeep,
@@ -43,10 +41,11 @@ import {
   createLogger,
 } from './helpers';
 
-import defaults from './defaults';
-
 const HOST_NAME = hostname();
-class RediBox {
+
+export * from './helpers';
+export { defaults };
+export default class RediBox extends EventEmitter {
 
   /**
    * @class RediBox
@@ -56,6 +55,7 @@ class RediBox {
    * @returns {RediBox} Returns new instance of RediBox
    */
   constructor(options, readyCallback = noop) {
+    super();
     this.options = options;
     this.readyCallback = readyCallback;
 
@@ -798,8 +798,3 @@ class RediBox {
     eventName.slice(this.options.redis.eventPrefix.length + 1, eventName.length);
 
 }
-
-inherits(RediBox, EventEmitter);
-export default RediBox;
-export * from './helpers';
-export { defaults };
