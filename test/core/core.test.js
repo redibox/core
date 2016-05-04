@@ -1,12 +1,11 @@
 import { assert } from 'chai';
-import RediBox from './../../lib';
-import { after } from './../../src/helpers';
+import RediBox, { after } from './../../src/core';
 
 describe('core', () => {
   it('Should fail to connect to a dead redis server', function testA(done) {
-    this.timeout(5000);
+    this.timeout(750);
     const redibox = new RediBox({
-      redis: { port: 9999, connectionTimeout: 750 },
+      redis: { port: 9999, connectionTimeout: 300 },
     });
     // error listener otherwise it gets thrown
     redibox.on('error', (error) => {

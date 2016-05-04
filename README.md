@@ -2,10 +2,10 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/redibox/core/badge.svg?branch=master)](https://coveralls.io/github/redibox/core?branch=master)
 ![Downloads](https://img.shields.io/npm/dt/redibox.svg)
-![npm version](https://img.shields.io/npm/v/redibox.svg)
-![dependencies](https://img.shields.io/david/redibox/core.svg)
-![build](https://travis-ci.org/redibox/core.svg)
-![License](https://img.shields.io/npm/l/redibox.svg)
+[![npm version](https://img.shields.io/npm/v/redibox.svg)](https://www.npmjs.com/package/redibox)
+[![dependencies](https://img.shields.io/david/redibox/core.svg)](https://david-dm.org/redibox/core)
+[![build](https://travis-ci.org/redibox/core.svg)](https://travis-ci.org/redibox/core)
+[![License](https://img.shields.io/npm/l/redibox.svg)](/LICENSE)
 
 Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis).
 

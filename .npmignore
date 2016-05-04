@@ -26,6 +26,7 @@ work
 build
 src
 test
+tests-hook.js
 pids
 logs
 results

@@ -1,10 +1,10 @@
 {
-  "plugins": [
-    "transform-flow-strip-types",
-    "add-module-exports"
-  ],
   "presets": [
-    "es2015",
+    "es2015-node-auto",
     "stage-0"
+  ],
+  "ignore": [
+    "lib/**/*.js",
+    "node_modules"
   ]
 }
