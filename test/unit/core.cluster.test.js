@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import RediBox from './../../src';
+import RediBox from './../../lib';
 
 /**
  * These tests require a cluster running locally:

@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import RediBox from './../../src';
+import RediBox from './../../lib';
 import { after } from './../../src/helpers';
 
 describe('core', () => {
