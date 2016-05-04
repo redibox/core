@@ -48,6 +48,8 @@ describe('core cluster', () => {
       assert.equal(rdbStatus.client, 'ready');
       assert.equal(rdbStatus.client_read, 'ready');
       assert.isNull(err, 'Cluster Connected!');
+      assert.isDefined(redibox.clients.readWrite);
+      assert.isDefined(redibox.clients.readOnly);
       redibox.quit();
       done();
     });
@@ -92,6 +94,8 @@ describe('core cluster', () => {
     }, (err, rdbStatus) => {
       assert.equal(rdbStatus.client, 'ready');
       assert.equal(rdbStatus.client_read, null);
+      assert.isDefined(redibox.clients.readWrite);
+      assert.isUndefined(redibox.clients.readOnly);
       assert.isNull(err, 'Cluster Connected!');
       redibox.quit();
       done();

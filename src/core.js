@@ -57,10 +57,10 @@ export default class RediBox extends EventEmitter {
   constructor(options, readyCallback = noop) {
     super();
     this.options = options;
-    this.readyCallback = readyCallback;
 
+    let readyCallbackLocal = readyCallback;
     if (isFunction(this.options)) {
-      this.readyCallback = this.options;
+      readyCallbackLocal = this.options;
       this.options = {};
     }
 
@@ -71,21 +71,19 @@ export default class RediBox extends EventEmitter {
     // keep a timestamp of when we started
     this.bootedAtTimestamp = Date.now();
 
-    this.commands = {};
-
     this.clients = {};
 
     // merge default options
     this.options = mergeDeep(defaults(), this.options);
 
     // detect if we're a cluster
-    this.options.redis.cluster = !!this.options.redis.hosts;
+    this.options.redis.cluster = !!this.options.redis.hosts && this.options.redis.hosts.length;
 
     // setup new logger
     this.log = createLogger(this.options.log);
 
     // because once is more than enough ;p
-    this._callBackOnce = once(this.readyCallback);
+    this._callBackOnce = once(readyCallbackLocal);
 
     // setup connection timeout
     this._connectFailedTimeout = setTimeout(() => {
@@ -99,18 +97,6 @@ export default class RediBox extends EventEmitter {
 
     // https://github.com/luin/ioredis#error-handling
     Redis.Promise.onPossiblyUnhandledRejection(this._redisError);
-
-    if (this.options.redis.cluster) {
-      this.log.verbose('Starting in cluster mode...');
-      // check we have at least one host in the config.
-      if (!this.options.redis.hosts && this.options.redis.hosts.length) {
-        const noClusterHostsError = new Error(
-          'No hosts found! When in cluster mode a config array of hosts is required.'
-        );
-        this.emit('error', noClusterHostsError);
-        return this._callBackOnce(noClusterHostsError, {});
-      }
-    }
 
     // normal read/write client
     this.createClient('readWrite', reportReady);
@@ -194,15 +180,17 @@ export default class RediBox extends EventEmitter {
    * @returns {null}
    */
   _redisError = (error) => {
+    /* istanbul ignore if */
     if (error) {
-      if (this.options.logRedisErrors) this.log.error(error);
-      this.emit('error', error);
+      if (this.options.logRedisErrors) return this.log.error(error);
+      return this.emit('error', error);
     }
+
+    return void 0;
   };
 
   /**
    * Creates a new redis client, connects and then onto the core class
-   * @private
    * @param clientName client name, this is also the property name on
    * @param readOnly
    * @param readyCallback
@@ -230,9 +218,7 @@ export default class RediBox extends EventEmitter {
 
     // non cluster connection
     if (!this.options.redis.cluster) {
-      this.log.verbose(
-        `Creating a ${readOnly ? 'read only' : 'read/write'} redis client. (${clientName})`
-      );
+      this.log.verbose(`Creating a read/write redis client. (${clientName})`);
       this.clients[clientName] = new Redis(this.options.redis);
     }
 
@@ -242,6 +228,8 @@ export default class RediBox extends EventEmitter {
       );
       return readyCallback();
     });
+
+    return this.clients[clientName];
   }
 
   /**
@@ -255,9 +243,9 @@ export default class RediBox extends EventEmitter {
       process: {
         pid: process.pid,
         title: process.title,
-        uptime: process.uptime(),
-        boot_time: this.bootedAtTimestamp,
-        hostname: HOST_NAME,
+        up_time: process.uptime(),
+        started_at: this.bootedAtTimestamp,
+        host_name: HOST_NAME,
         version: process.version,
       },
 
@@ -532,6 +520,9 @@ export default class RediBox extends EventEmitter {
     if (this.clients.publisher) {
       this.clients.publisher.quit();
     }
+
+    process.removeListener('SIGTERM', this.quit);
+    process.removeListener('SIGINT', this.quit);
   };
 
   /**
@@ -550,6 +541,9 @@ export default class RediBox extends EventEmitter {
     if (this.clients.publisher) {
       this.clients.publisher.disconnect();
     }
+
+    process.removeListener('SIGTERM', this.quit);
+    process.removeListener('SIGINT', this.quit);
   }
 
   /**

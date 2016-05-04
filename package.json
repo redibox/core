@@ -38,7 +38,7 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run lint && npm run build",
     "lint": "./node_modules/.bin/eslint ./src",
-    "test": "./node_modules/.bin/babel-node -- ./node_modules/.bin/isparta cover _mocha "
+    "test": "./node_modules/.bin/babel-node -- ./node_modules/.bin/isparta cover --excludes helpers.js --report lcov _mocha "
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
