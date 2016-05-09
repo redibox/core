@@ -59,7 +59,9 @@ function loadHook(hook, core) {
       ready();
     }).catch((error) => {
       core.log.error(`Hook '${hookName}' has errored during initialize, aborting.`);
-      throw error;
+      core.log.error(error);
+      // exit just to be on the safe side
+      process.exit(0);
     });
   };
 }
@@ -104,7 +106,7 @@ export default function (core) {
     return Promise.resolve();
   }
 
-  return new Promise((resolve) => {
-    parallel(hooks, resolve);
+  return new Promise((resolve, reject) => {
+    parallel(hooks, error => error ? reject(error) : resolve());
   });
 }

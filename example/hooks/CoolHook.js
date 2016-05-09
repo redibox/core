@@ -1,4 +1,4 @@
-import { Hook } from './../../src/hooks/hook';
+import Hook from './../../src/hooks/hook';
 
 export default class CoolHook extends Hook {
   constructor() {
@@ -18,9 +18,8 @@ export default class CoolHook extends Hook {
     // this.options - the user provided options pre-merged with defaults from this.defaults()
     // this.defaultClient -  the default redis client that redibox core uses
     // this.clients - where all this hooks custom redis clients live
-
-    this.log.info(this.options);
     return new Promise((resolve) => {
+      this.log.info(this.options);
       // create new redis client connections if needed
       this.createClient('coolClient', false, () => {
         // you now have a client at 'this.clients.coolClient'
