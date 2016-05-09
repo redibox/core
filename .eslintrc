@@ -4,12 +4,7 @@
     "airbnb"
   ],
   "rules": {
-    "no-underscore-dangle": [
-      "error",
-      {
-        "allowAfterThis": true
-      }
-    ]
+    "no-underscore-dangle": 0
   },
   "globals": {
     "describe": true,

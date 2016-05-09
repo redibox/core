@@ -9,6 +9,7 @@ const hookPrefix = 'redibox-hook';
  */
 function tryRequire(module) {
   try {
+    /* eslint global-require: 0 */
     return require(module);
   } catch (e) {
     return undefined;
@@ -52,7 +53,7 @@ function loadHook(hook, core) {
     userHook.options = mergeDeep(defaults, core.options[hookName] || {});
 
     // init hook
-    userHook.initialize().then(() => {
+    return userHook.initialize().then(() => {
       core.emit(userHook.toEventName('ready'));
       core.log.verbose(`Hook '${hookName}' has been initialized.`);
       ready();
