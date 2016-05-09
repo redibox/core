@@ -26,6 +26,8 @@
 
 import { Logger, transports } from 'winston';
 import { createHash } from 'crypto';
+import { sep, join } from 'path';
+import { existsSync, readFileSync } from 'fs';
 
 /**
  * Generates from sha1 sum from an object.
@@ -210,4 +212,34 @@ export function mergeDeep(target, source) {
     });
   }
   return target;
+}
+
+
+export function tryJSONParse(message) {
+  try {
+    return JSON.parse(message);
+  } catch (jsonError) {
+    return undefined;
+  }
+}
+
+/**
+ * Find package.json files.
+ *
+ * @param {String} root The root directory we should look in.
+ * @returns {Object} Iterator interface.
+ * @api public
+ */
+export function loadPackageJSON(root = process.cwd()) {
+  if (root === sep) {
+    return undefined;
+  }
+
+  const file = join(root, 'package.json');
+
+  if (existsSync(file)) {
+    return tryJSONParse(readFileSync(file));
+  }
+
+  return undefined;
 }

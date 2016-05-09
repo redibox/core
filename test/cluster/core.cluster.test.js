@@ -78,11 +78,21 @@ describe('cluster', () => {
     });
   });
 
+  it('Should return an empty arrays of node addresses when not a cluster', function testB(done) {
+    const redibox = new RediBox(() => {
+      assert.isFalse(redibox.options.redis.cluster);
+      assert.deepEqual(redibox.clusterGetMasters(), []);
+      assert.deepEqual(redibox.clusterGetSlaves(), []);
+      assert.deepEqual(redibox.clusterGetNodes(), []);
+      done();
+    });
+  });
+
   it('Should return an array of redis slave node addresses', function testB(done) {
-    const redibox = new RediBox(clusterConfig, (rdbStatus) => {
+    const redibox = new RediBox(clusterConfig, () => {
       assert.isTrue(redibox.options.redis.cluster);
       assert.isObject(redibox.clients.readWrite.connectionPool.nodes.slave);
-      const slavesExpected = ['127.0.0.1:30006', '127.0.0.1:30004', '127.0.0.1:30005'];
+      const slavesExpected = ['127.0.0.1:30004', '127.0.0.1:30005', '127.0.0.1:30006'];
       const slaves = redibox.clusterGetSlaves();
       assert.isArray(slaves);
       assert.equal(slaves.length, 3);
@@ -131,5 +141,4 @@ describe('cluster', () => {
       done();
     });
   });
-
 });

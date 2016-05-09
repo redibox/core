@@ -31,6 +31,7 @@ import each from 'async/each';
 import Promise from 'bluebird';
 import EventEmitter from 'eventemitter3';
 import defaults from './defaults';
+import hookLoader from './hooks/loader';
 import {
   after,
   mergeDeep,
@@ -72,6 +73,8 @@ export default class RediBox extends EventEmitter {
     this.bootedAtTimestamp = Date.now();
 
     this.clients = {};
+
+    this.hooks = {};
 
     // merge default options
     this.options = mergeDeep(defaults(), this.options);
@@ -165,11 +168,13 @@ export default class RediBox extends EventEmitter {
     this.log.verbose('-----------------------');
     this.log.verbose(' RediBox is now ready! ');
     this.log.verbose('-----------------------\n');
-    this.emit('ready', clients);
 
-    // set immediate to allow ioredis to init cluster.
-    // without this cluster nodes are sometimes undefined ??
-    this._callBackOnce(null, clients);
+    hookLoader(this).then(() => {
+      this.emit('ready', clients);
+      // set immediate to allow ioredis to init cluster.
+      // without this cluster nodes are sometimes undefined ??
+      this._callBackOnce(null, clients);
+    });
   };
 
   /**
@@ -194,8 +199,10 @@ export default class RediBox extends EventEmitter {
    * @param clientName client name, this is also the property name on
    * @param readOnly
    * @param readyCallback
+   * @param target
    */
-  createClient(clientName, readOnly, readyCallback = noop) {
+  createClient(clientName, readOnly, readyCallback = noop, target) {
+    let client;
     /* eslint no-param-reassign:0 */
     if (isFunction(readOnly)) {
       readyCallback = readOnly;
@@ -208,28 +215,34 @@ export default class RediBox extends EventEmitter {
         `Creating a ${readOnly ? 'read only' : 'read/write'} redis CLUSTER client. (${clientName})`
       );
 
-      this.clients[clientName] = new Redis.Cluster(
+      client = new Redis.Cluster(
         this.options.redis.hosts,
         Object.assign({ scaleReads: readOnly ? 'all' : 'master' }, this.options.redis)
       );
 
-      this.clients[clientName].readOnly = readOnly;
+      client.readOnly = readOnly;
     }
 
     // non cluster connection
     if (!this.options.redis.cluster) {
       this.log.verbose(`Creating a read/write redis client. (${clientName})`);
-      this.clients[clientName] = new Redis(this.options.redis);
+      client = new Redis(this.options.redis);
     }
 
-    this.clients[clientName].once('ready', () => {
+    client.once('ready', () => {
       this.log.verbose(
         `${readOnly ? 'Read only' : 'Read/write'} redis client '${clientName}' is ready!`
       );
       return readyCallback();
     });
 
-    return this.clients[clientName];
+    if (target) {
+      target[clientName] = client;
+    } else {
+      this.clients[clientName] = client;
+    }
+
+    return client;
   }
 
   /**
@@ -471,11 +484,19 @@ export default class RediBox extends EventEmitter {
   publish(channels, message, published = noop) {
     const channelsArray = [].concat(channels).map(this.toEventName);
 
-    const messageStringified = (isObject(message) || Array.isArray(message)) ?
-      JSON.stringify(message) :
-      message;
+    let messageStringified = '';
+    if (isObject(message) || Array.isArray(message)) {
+      try {
+        messageStringified = JSON.stringify(message);
+      } catch (e) {
+        this._redisError(e);
+        return published(e);
+      }
+    } else {
+      messageStringified = message;
+    }
 
-    each(channelsArray, (channel, publishedToChannel) => {
+    return each(channelsArray, (channel, publishedToChannel) => {
       this.clients.publisher.publish(channel, messageStringified, publishedToChannel);
     }, published);
   }
@@ -578,7 +599,7 @@ export default class RediBox extends EventEmitter {
    * @returns {Array}
    */
   clusterGetNodes() {
-    if (!this.options.redis.cluster) {
+    if (this.options.redis.cluster === false) {
       return [];
     }
     return Object.keys(this.clients.readWrite.connectionPool.nodes.all);
@@ -589,7 +610,7 @@ export default class RediBox extends EventEmitter {
    * @returns {Array}
    */
   clusterGetSlaves() {
-    if (!this.options.redis.cluster) {
+    if (this.options.redis.cluster === false) {
       return [];
     }
     return Object.keys(this.clients.readWrite.connectionPool.nodes.slave);
@@ -600,7 +621,7 @@ export default class RediBox extends EventEmitter {
    * @returns {Array}
    */
   clusterGetMasters() {
-    if (!this.options.redis.cluster) {
+    if (this.options.redis.cluster === false) {
       return [];
     }
     return Object.keys(this.clients.readWrite.connectionPool.nodes.master);

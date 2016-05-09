@@ -35,15 +35,18 @@
     "build4": "babel src --babelrc=false --presets es2015-node4,stage-0 --plugins add-module-exports --out-dir lib/4",
     "build5": "babel src --babelrc=false --presets es2015-node5,stage-0 --plugins add-module-exports --out-dir lib/5",
     "build6": "babel src --babelrc=false --presets es2015-node6,stage-0 --plugins add-module-exports --out-dir lib/6",
+    "example": "cd example && ./../node_modules/.bin/babel-node app.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run lint && npm run build",
     "lint": "./node_modules/.bin/eslint ./src",
-    "test": "./node_modules/.bin/babel-node -- ./node_modules/.bin/isparta cover --excludes helpers.js --report lcov _mocha "
+    "test": "./node_modules/.bin/babel-node -- ./node_modules/.bin/babel-istanbul cover --report lcov _mocha "
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
     "babel-eslint": "^6.0.4",
+    "babel-istanbul": "^0.8.0",
     "babel-plugin-add-module-exports": "^0.1.2",
+    "babel-plugin-transform-class-properties": "^6.8.0",
     "babel-preset-es2015": "^6.6.0",
     "babel-preset-es2015-node-auto": "0.0.3",
     "babel-preset-es2015-node4": "^2.1.0",
