@@ -5,7 +5,7 @@ export default class Hook extends EventEmitter {
 
   constructor(name) {
     super();
-    this.name = name;
+    this.name = name.toLowerCase();
     this.core = null;
     this.defaultClient = null;
     this.clients = {};
