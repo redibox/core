@@ -9,6 +9,12 @@ const RediBox = new Redibox({
   // any npm dependencies in your package.json file that start with
   // 'redibox-hook' are automatically required and initialized.
   hooks: [CoolHook],
+
+  // the hook is called 'cool' so lets create a key with the same name
+  // this key is then sent to the hook as it's config options.
+  cool: {
+    someUserSetting: 1337,
+  },
 });
 
 RediBox.on('ready', () => {
