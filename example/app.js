@@ -26,3 +26,4 @@ RediBox.on('ready', () => {
   // we have a 'cool' hook.
   RediBox.hooks.cool.isThisCoolOrWhat(true);
 });
+

@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import RediBox from './../../src/core';
 
 const clusterConfig = {
+  log: { level: 'verbose' },
   redis: {
     clusterScaleReads: false, // single client only
     connectionTimeout: 3500,
@@ -47,11 +48,9 @@ describe('cluster', () => {
     this.timeout(4000);
     const config = clusterConfig;
     config.redis.clusterScaleReads = true;
-    const redibox = new RediBox(config, (err, rdbStatus) => {
+    const redibox = new RediBox(config, (err) => {
+      assert.isNull(err);
       assert.isTrue(redibox.options.redis.cluster);
-      assert.equal(rdbStatus.client, 'ready');
-      assert.equal(rdbStatus.client_read, 'ready');
-      assert.isNull(err, 'Cluster Connected!');
       assert.isDefined(redibox.clients.readWrite);
       assert.isDefined(redibox.clients.readOnly);
       redibox.quit();
@@ -64,13 +63,11 @@ describe('cluster', () => {
   it('Should connect to a cluster and create a single client only', function testB(done) {
     const config = clusterConfig;
     config.redis.clusterScaleReads = false;
-    const redibox = new RediBox(config, (err, rdbStatus) => {
+    const redibox = new RediBox(config, (err) => {
       assert.isTrue(redibox.options.redis.cluster);
-      assert.equal(rdbStatus.client, 'ready');
-      assert.equal(rdbStatus.client_read, null);
       assert.isDefined(redibox.clients.readWrite);
       assert.isUndefined(redibox.clients.readOnly);
-      assert.isNull(err, 'Cluster Connected!');
+      assert.isNull(err);
       redibox.quit();
       done();
     });

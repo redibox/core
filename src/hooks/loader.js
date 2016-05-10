@@ -95,12 +95,12 @@ export default function (core) {
   }
 
   const hooks = [];
-
-  dependencies.forEach((dependency) => {
-    if (dependency.indexOf(hookPrefix) !== -1) {
-      hooks.push(loadHook(dependency, core));
+  const length = dependencies.length;
+  for (let i = 0; i < length; i++) {
+    if (dependencies[i].indexOf(hookPrefix) !== -1) {
+      hooks.push(loadHook(dependencies[i], core));
     }
-  });
+  }
 
   if (!hooks.length) {
     return Promise.resolve();

@@ -4,9 +4,9 @@ import RediBox, { after } from './../../src/core';
 
 describe('core', () => {
   it('Should timeout to connecting to a offline redis server', function testA(done) {
-    this.timeout(750);
+    this.timeout(200);
     const redibox = new RediBox({
-      redis: { port: 9999, connectionTimeout: 275 },
+      redis: { port: 9999, connectionTimeout: 150 },
     });
     // error listener otherwise it gets thrown
     redibox.on('error', (error) => {

@@ -40,6 +40,9 @@ import {
   isObject,
   isFunction,
   createLogger,
+  tryJSONParse,
+  tryJSONStringify,
+  getTimeStamp,
 } from './helpers';
 
 const HOST_NAME = hostname();
@@ -155,25 +158,24 @@ export default class RediBox extends EventEmitter {
    * @private
    */
   _allClientsReady = () => {
-    this.log.verbose('All Redis clients have reported \'ready\'.');
     clearTimeout(this._connectFailedTimeout);
+    this.log.verbose('All Redis clients have reported \'ready\'.');
 
-    const clients = {
-      client: this.clients.readWrite.status,
-      client_read: (this.options.redis.cluster && this.options.redis.clusterScaleReads) ?
-        this.clients.readOnly.status :
-        null,
-    };
-
-    this.log.verbose('-----------------------');
-    this.log.verbose(' RediBox is now ready! ');
-    this.log.verbose('-----------------------\n');
+    // const clients = {
+    //   client: this.clients.readWrite.status,
+    //   client_read: (this.options.redis.cluster && this.options.redis.clusterScaleReads) ?
+    //     this.clients.readOnly.status :
+    //     null,
+    // };
 
     hookLoader(this).then(() => {
-      this.emit('ready', clients);
+      this.emit('ready');
+      this.log.verbose('-----------------------');
+      this.log.verbose(' RediBox is now ready! ');
+      this.log.verbose('-----------------------\n');
       // set immediate to allow ioredis to init cluster.
       // without this cluster nodes are sometimes undefined ??
-      this._callBackOnce(null, clients);
+      this._callBackOnce(null);
     });
   };
 
@@ -261,9 +263,7 @@ export default class RediBox extends EventEmitter {
         host_name: HOST_NAME,
         version: process.version,
       },
-
-      timestamp: new Date().getTime(),
-      timestamp_human: new Date(),
+      timestamp: getTimeStamp(),
     };
   }
 
@@ -291,9 +291,9 @@ export default class RediBox extends EventEmitter {
   _onMessage = (channel, message) => {
     if (this._subscriberMessageEvents.listeners(channel, true)) {
       this._subscriberMessageEvents.emit(channel, {
-        data: this._tryJSONParse(message),
+        data: tryJSONParse(message),
         channel: this.removeEventPrefix(channel),
-        timestamp: Math.floor(Date.now() / 1000),
+        timestamp: getTimeStamp(),
       });
     }
   };
@@ -310,19 +310,19 @@ export default class RediBox extends EventEmitter {
       this._subscriberMessageEvents.emit(
         channel,
         {
-          data: this._tryJSONParse(message),
+          data: tryJSONParse(message),
           channel: this.removeEventPrefix(channel),
           pattern,
-          timestamp: Math.floor(Date.now() / 1000),
+          timestamp: getTimeStamp(),
         }
       );
     }
     if (pattern !== channel && this._subscriberMessageEvents.listeners(channel, true) > 0) {
       this._subscriberMessageEvents.emit(pattern, {
-        data: this._tryJSONParse(message),
+        data: tryJSONParse(message),
         channel: this.removeEventPrefix(channel),
         pattern,
-        timestamp: Math.floor(Date.now() / 1000),
+        timestamp: getTimeStamp(),
       });
     }
   };
@@ -402,7 +402,7 @@ export default class RediBox extends EventEmitter {
               timeout: true,
               timeoutPeriod: timeout,
               data: null,
-              timestamp: Math.floor(Date.now() / 1000),
+              timestamp: getTimeStamp(),
             });
           });
         }, timeout);
@@ -452,7 +452,7 @@ export default class RediBox extends EventEmitter {
           timeout: true,
           timeoutPeriod: timeout,
           message: null,
-          timestamp: Math.floor(Date.now() / 1000),
+          timestamp: getTimeStamp(),
         });
       }, timeout + 50);
     }
@@ -482,15 +482,14 @@ export default class RediBox extends EventEmitter {
    * @param published
    */
   publish(channels, message, published = noop) {
+    let messageStringified;
     const channelsArray = [].concat(channels).map(this.toEventName);
 
-    let messageStringified = '';
     if (isObject(message) || Array.isArray(message)) {
-      try {
-        messageStringified = JSON.stringify(message);
-      } catch (e) {
-        this._redisError(e);
-        return published(e);
+      messageStringified = tryJSONStringify(message);
+      if (messageStringified === undefined) {
+        this._redisError('Cannot JSON stringify message.');
+        return published('Cannot JSON stringify message.');
       }
     } else {
       messageStringified = message;

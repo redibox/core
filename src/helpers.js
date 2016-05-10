@@ -28,6 +28,7 @@ import { Logger, transports } from 'winston';
 import { createHash } from 'crypto';
 import { sep, join } from 'path';
 import { existsSync, readFileSync } from 'fs';
+import { encode, decode } from 'json-simple';
 
 /**
  * Generates from sha1 sum from an object.
@@ -41,12 +42,20 @@ export function sha1sum(data) {
 }
 
 /**
- * Get the current unix timestamp
+ * Get the current timestamp, but way faster,
+ * Caches the timestamp per 10ms or 1000 calls
  * @param date
  * @returns {number}
  */
-export function getTimeStamp(date) {
-  return Math.floor((date || Date.now()) / 1000);
+let _timestamp;
+let _ncalls = 0;
+export function getTimeStamp() {
+  if (!_timestamp || ++_ncalls > 1000) {
+    _timestamp = Date.now();
+    _ncalls = 0;
+    setTimeout(() => { _timestamp = null; }, 10);
+  }
+  return _timestamp;
 }
 
 /**
@@ -187,12 +196,10 @@ export function isObject(item) {
 
 /**
  * Generate a random integer between two numbers
- * @param min
- * @param max
  * @returns {number}
  */
-export function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+export function randomInt() {
+  return Math.floor(Math.random() * 0x100000000 | 0).toString(16);
 }
 
 /**
@@ -214,10 +221,27 @@ export function mergeDeep(target, source) {
   return target;
 }
 
-
-export function tryJSONParse(message) {
+/**
+ *
+ * @param string
+ * @returns {*}
+ */
+export function tryJSONParse(string) {
   try {
-    return JSON.parse(message);
+    return decode(string);
+  } catch (jsonError) {
+    return string;
+  }
+}
+
+/**
+ *
+ * @param data
+ * @returns {*}
+ */
+export function tryJSONStringify(data) {
+  try {
+    return encode(data);
   } catch (jsonError) {
     return undefined;
   }

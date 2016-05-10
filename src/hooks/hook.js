@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import {} from './../helpers';
 
-class Hook extends EventEmitter {
+export default class Hook extends EventEmitter {
 
   constructor(name) {
     super();
