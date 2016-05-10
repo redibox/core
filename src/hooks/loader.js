@@ -97,7 +97,9 @@ export default function (core) {
   const hooks = [];
   const length = dependencies.length;
   for (let i = 0; i < length; i++) {
-    if (dependencies[i].indexOf(hookPrefix) !== -1) {
+    const name = dependencies[i];
+    if (name.indexOf(hookPrefix) !== -1) {
+      // todo check not disabled in config
       hooks.push(loadHook(dependencies[i], core));
     }
   }

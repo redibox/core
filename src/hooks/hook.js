@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
 import {} from './../helpers';
 
-export default class Hook extends EventEmitter {
+class Hook extends EventEmitter {
 
   constructor(name) {
     super();
@@ -22,7 +22,7 @@ export default class Hook extends EventEmitter {
   }
 
   /**
-   *
+   * Stub function to return config defaults for the hook
    * @returns {{}}
    */
   defaults() {
@@ -30,12 +30,14 @@ export default class Hook extends EventEmitter {
   }
 
   /**
-   *
+   * Setup references to core, logger and the default client
    * @param core
    * @private
    */
   _setCore(core) {
     this.core = core;
+    // setup logger
+    this.log = this.core.log;
     // setup the default client
     this.defaultClient = this.core.clients.readWrite;
   }
@@ -52,8 +54,9 @@ export default class Hook extends EventEmitter {
   }
 
   /**
-   *
-   */
+   * Attach hook to the core.hooks namespace if not already mounted.
+   * @private
+	 */
   _mount() {
     if (!this._mounted) {
       // attach to hooks
@@ -63,17 +66,6 @@ export default class Hook extends EventEmitter {
       this._mounted = true;
       this._emitInternalEvent('mount');
     }
-  }
-
-  /**
-   *
-   * @param event
-   * @param data
-   * @private
-   */
-  _emitInternalEvent(event, data) {
-    this.emit(event, data);
-    if (this.core) this.core.emit(this.toEventName(event, data));
   }
 
   /**
@@ -89,9 +81,24 @@ export default class Hook extends EventEmitter {
   }
 
   /**
+   *
+   * @param event
+   * @param data
+   * @private
+   */
+  _emitInternalEvent(event, data) {
+    this.emit(event, data);
+    if (this.core) this.core.emit(this.toEventName(event, data));
+  }
+
+
+
+  /**
    * Add the eventPrefix to an event name
    * @param eventName
    * @returns {string}
    */
   toEventName = eventName => `hook:${this.name}:${eventName}`;
 }
+
+export default Hook;
