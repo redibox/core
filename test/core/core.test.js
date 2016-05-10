@@ -90,7 +90,6 @@ describe('core', () => {
     assert.isDefined(hostInfo.process.version);
     assert.isDefined(hostInfo.process.pid);
     assert.isDefined(hostInfo.timestamp);
-    assert.isDefined(hostInfo.timestamp_human);
     redibox.quit();
     done();
   });

@@ -43,7 +43,7 @@ export function sha1sum(data) {
 
 /**
  * Get the current timestamp, but way faster,
- * Caches the timestamp per 10ms or 1000 calls
+ * Caches the timestamp per 50ms or 1000 calls
  * @param date
  * @returns {number}
  */
@@ -53,7 +53,7 @@ export function getTimeStamp() {
   if (!_timestamp || ++_ncalls > 1000) {
     _timestamp = Date.now();
     _ncalls = 0;
-    setTimeout(() => { _timestamp = null; }, 10);
+    setTimeout(() => { _timestamp = null; }, 50);
   }
   return _timestamp;
 }
