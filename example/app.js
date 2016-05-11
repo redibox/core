@@ -9,16 +9,12 @@ const RediBox = new Redibox({
   // any npm dependencies in your package.json file that start with
   // 'redibox-hook' are automatically required and initialized.
   hooks: {
-    // can be a constructor
-    cool: CoolHook,
-    // or can be a npm module name - false to stop loading from package.json
-    'redibox-hook-schedule': false,
-  },
-
-  // the hook is called 'cool' so lets create a key with the same name
-  // this key is then sent to the hook as it's config options.
-  cool: {
-    someUserSetting: 1337,
+    // can be a array with constructor and optional config
+    cool: [CoolHook, { explodingKittens: 'Hello, im a pizza!' }],
+    // or can be a boolean - false to stop loading from package.json
+    schedule: false,
+    // or config for a hook
+    moo: {},
   },
 });
 
@@ -27,5 +23,6 @@ RediBox.on('ready', () => {
 
   // we have a 'cool' hook.
   RediBox.hooks.cool.isThisCoolOrWhat(true);
+  RediBox.hooks.cool.isThisCoolOrWhat(false);
 });
 

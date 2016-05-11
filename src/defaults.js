@@ -36,5 +36,6 @@ export default function () {
       prettyPrint: true,
       humanReadableUnhandledException: true,
     },
+    hooks: {},
   };
 }

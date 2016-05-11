@@ -4,6 +4,7 @@ export default class CoolHook extends Hook {
   constructor() {
     // super with the hook name
     // also used for the hooks key name
+    // e.g this will mount at RediBox.hooks.cool
     super('cool');
   }
 
@@ -19,10 +20,11 @@ export default class CoolHook extends Hook {
     // this.defaultClient -  the default redis client that redibox core uses
     // this.clients - where all this hooks custom redis clients live
     return new Promise((resolve) => {
+      // options will have `kittenSays` and `explodingKittens`
       this.log.info(this.options);
       // create new redis client connections if needed
-      this.createClient('coolClient', false, () => {
-        // you now have a client at 'this.clients.coolClient'
+      this.createClient('coolio', false, () => {
+        // you now have a client at 'this.clients.coolio'
         resolve();
       });
     });
@@ -35,7 +37,7 @@ export default class CoolHook extends Hook {
    */
   defaults() {
     return {
-      someDefaultThing: 'moo',
+      kittenSays: 'meow',
     };
   }
 
