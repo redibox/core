@@ -90,7 +90,7 @@ export default class RediBox extends EventEmitter {
 
     // because once is more than enough ;p
     this._callBackOnce = once(readyCallbackLocal);
-
+    
     // setup connection timeout
     this._connectFailedTimeout = setTimeout(() => {
       const error = new Error('Failed to connect to redis, please check your config / servers.');
@@ -159,7 +159,7 @@ export default class RediBox extends EventEmitter {
    */
   _allClientsReady = () => {
     clearTimeout(this._connectFailedTimeout);
-    this.log.verbose('All Redis clients have reported \'ready\'.');
+    this.log.debug('All Redis clients have reported \'ready\'.');
 
     // const clients = {
     //   client: this.clients.readWrite.status,
@@ -170,9 +170,9 @@ export default class RediBox extends EventEmitter {
 
     hookLoader(this).then(() => {
       this.emit('ready');
-      this.log.verbose('-----------------------');
-      this.log.verbose(' RediBox is now ready! ');
-      this.log.verbose('-----------------------\n');
+      this.log.debug('-----------------------');
+      this.log.debug(' RediBox is now ready! ');
+      this.log.debug('-----------------------\n');
       // set immediate to allow ioredis to init cluster.
       // without this cluster nodes are sometimes undefined ??
       this._callBackOnce(null);
@@ -213,7 +213,7 @@ export default class RediBox extends EventEmitter {
 
     // cluster connection
     if (this.options.redis.cluster) {
-      this.log.verbose(
+      this.log.debug(
         `Creating a ${readOnly ? 'read only' : 'read/write'} redis CLUSTER client. (${clientName})`
       );
 
@@ -227,12 +227,12 @@ export default class RediBox extends EventEmitter {
 
     // non cluster connection
     if (!this.options.redis.cluster) {
-      this.log.verbose(`Creating a read/write redis client. (${clientName})`);
+      this.log.debug(`Creating a read/write redis client. (${clientName})`);
       client = new Redis(this.options.redis);
     }
 
     client.once('ready', () => {
-      this.log.verbose(
+      this.log.debug(
         `${readOnly ? 'Read only' : 'Read/write'} redis client '${clientName}' is ready!`
       );
       return readyCallback();
@@ -265,21 +265,6 @@ export default class RediBox extends EventEmitter {
       },
       timestamp: getTimeStamp(),
     };
-  }
-
-  /**
-   * Attempts to serialize a json string into an object, else return
-   * the original value.
-   * @param message
-   * @returns {string}
-   * @private
-   */
-  _tryJSONParse(message) {
-    try {
-      return JSON.parse(message);
-    } catch (jsonError) {
-      return message;
-    }
   }
 
   /**
@@ -335,12 +320,12 @@ export default class RediBox extends EventEmitter {
    */
   _unsubscribeAfterOnce(channel, completed = noop) {
     const channelWithPrefix = this.toEventName(channel);
-    this.log.verbose(`Checking to see if we should unsub from channel '${channelWithPrefix}'.`);
+    this.log.debug(`Checking to see if we should unsub from channel '${channelWithPrefix}'.`);
     this.getClient().pubsub('numsub', channelWithPrefix)
         .then((countSubs) => {
-          this.log.verbose(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
+          this.log.debug(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
           if (countSubs[1] <= 1) {
-            this.log.verbose(`Unsubscribing from channel '${channelWithPrefix}'.`);
+            this.log.debug(`Unsubscribing from channel '${channelWithPrefix}'.`);
             // need the original non-prefix name here as unsub already adds it.
             return this.unsubscribe(channel, null, error => {
               if (error) this._redisError(error);
@@ -411,7 +396,7 @@ export default class RediBox extends EventEmitter {
       this.clients.subscriber.subscribe(channelWithPrefix, (subscribeError, count) => {
         if (subscribeError) return subscribeOnceDone(subscribeError, count);
         if (!timeout || !timedOut) {
-          this.log.verbose(`Subscribed once to ${channelWithPrefix}`);
+          this.log.debug(`Subscribed once to ${channelWithPrefix}`);
           this._subscriberMessageEvents.once(channelWithPrefix, (obj) => {
             if (!timeout || !timedOut) {
               clearTimeout(timeOutTimer);
@@ -518,7 +503,7 @@ export default class RediBox extends EventEmitter {
 
     this.clients.subscriber.unsubscribe(...channelsArray, (err, count) => {
       if (err) return completed(err, count);
-      this.log.verbose(`Unsubscribed from ${channelsArray.toString()}`);
+      this.log.debug(`Unsubscribed from ${channelsArray.toString()}`);
       return completed();
     });
   }
@@ -732,20 +717,20 @@ export default class RediBox extends EventEmitter {
       const keyLower = key.toLowerCase();
       // quick validations
       if (!script.hasOwnProperty('keys')) {
-        return this.log.verbose(
+        return this.log.debug(
           `Script '${keyLower}' from '${module} is missing required property 'key'! ...SKIPPED!`
         );
       }
 
       if (!script.hasOwnProperty('lua')) {
-        return this.log.verbose(
+        return this.log.debug(
           `Script '${keyLower}' from '${module} is missing required property 'lua'! ...SKIPPED!`
         );
       }
 
       // read/write instance
       if (!this.clients.readWrite.hasOwnProperty(keyLower)) {
-        this.log.verbose(`Defining command for lua script '${keyLower}' from module '${module}'.`);
+        this.log.debug(`Defining command for lua script '${keyLower}' from module '${module}'.`);
         this.clients.readWrite.defineCommand(keyLower, {
           numberOfKeys: script.keys,
           lua: script.lua,
@@ -756,7 +741,7 @@ export default class RediBox extends EventEmitter {
       if (this.clients.readOnly && !this.clients.readOnly.hasOwnProperty(keyLower) &&
         script.hasOwnProperty('readOnly') &&
         script.readOnly === true) {
-        this.log.verbose(
+        this.log.debug(
           `Defining ready only command for lua script '${keyLower}' from module '${module}'.`
         );
         this.clients.readOnly.defineCommand(keyLower, {
@@ -788,6 +773,16 @@ export default class RediBox extends EventEmitter {
 
     return client[command].apply(null, args);
   };
+
+  /**
+   * Update a hooks config options
+   * @param key
+   * @param config
+   * @private
+   */
+  setHookConfig(key, config) {
+    this.options.hooks[key] = config;
+  }
 
   /**
    * For now just returns the same key.
