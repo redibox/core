@@ -95,7 +95,7 @@ Returns the connection state of the redis client provided.
 
 ## Cluster
 
-#### - clusterExec -
+#### - exec -
 Send a command to all cluster master nodes.
 
 **Parameters:**
@@ -106,7 +106,7 @@ Send a command to all cluster master nodes.
 
 **Example**:
 ```javascript
-  RediBox.clusterExec('flushall').then(function (result) {
+  RediBox.exec('flushall').then(function (result) {
     console.dir(result);
   }, function (error) {
     console.dir(error);

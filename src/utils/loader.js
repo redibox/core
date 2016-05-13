@@ -1,8 +1,7 @@
-import { loadPackageJSON, mergeDeep } from './../helpers';
-import { parallel } from 'async';
+import { loadPackageJSON, mergeDeep } from './../utils';
 const hookPrefix = 'redibox-hook';
-const hookRegexMatch = new RegExp(`@?[a-zA-Z-_0-9]*?\/?${hookPrefix}-([A-Za-z0-9-_]*)`);
 const hookRegexReplace = new RegExp(`@?[a-zA-Z-_0-9.]*?\/?${hookPrefix}-`);
+
 /**
  *
  * @param module
@@ -25,7 +24,7 @@ function tryRequire(module) {
  * @returns {function()}
  */
 function loadHook(UserHook, keyName, core) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     if (!UserHook) {
       core.log.warn(`Hook '${keyName}': npm module is not installed, skipping!`);
       return resolve();
@@ -38,8 +37,8 @@ function loadHook(UserHook, keyName, core) {
 
     // confirm the user hook actually extends the Hook class
     const protoName = Object.getPrototypeOf(UserHook).name;
-    if (protoName !== 'Hook') {
-      core.log.warn(`Hook '${keyName}': does not extend 'Hook', skipping!`);
+    if (protoName !== 'BaseHook') {
+      core.log.warn(`Hook '${keyName}': does not extend 'BaseHook', skipping!`);
       return resolve();
     }
 
@@ -47,7 +46,7 @@ function loadHook(UserHook, keyName, core) {
     const userHook = new UserHook();
     const hookName = userHook.name;
     const defaults = userHook.defaults() || {};
-    const hookUserConfig = core.options.hooks[keyName];
+    const hookUserConfig = core.options[keyName];
 
     // setup core ref
     userHook._setCore(core);
@@ -62,16 +61,35 @@ function loadHook(UserHook, keyName, core) {
       userHook.options = defaults;
     }
 
-    // init hook
-    return userHook.initialize().then(() => {
+    // setup connection timeout
+    const hookTimer = setTimeout(() => {
+      reject(new Error(
+        `Hook '${keyName}' timed out while initializing (${userHook.hookTimeout}ms)
+       Check to see if you're not missing a callback or a promise resolve/reject.`
+      ));
+    }, userHook.hookTimeout);
+
+    const initReturn = () => {
+      clearTimeout(hookTimer);
+      core._hooksCount++;
       core.emit(userHook.toEventName('ready'));
       core.log.debug(`Hook '${hookName}': initialized.`);
-      return resolve();
-    }).catch((error) => {
-      core.log.error(`Hook '${hookName}': error during initialize, aborting.`);
-      core.log.error(error);
-      return process.exit(0); // exit just to be on the safe side
-    });
+      resolve();
+    };
+
+    core.log.debug(`Hook '${keyName}': initialising`);
+    const hookInitPromise = userHook.initialize(initReturn);
+
+    if (!hookInitPromise) return void 0;
+
+    // init hook
+    return hookInitPromise
+      .then(initReturn)
+      .catch((error) => {
+        core.handleError(`Hook '${hookName}': error during initialize, aborting.`);
+        core.handleError(error);
+        return process.exit(0); // exit just to be on the safe side
+      });
   });
 }
 
@@ -80,7 +98,7 @@ function loadHook(UserHook, keyName, core) {
  * @param core
  * @returns {*}
  */
-export function importFromPackageJson(core) {
+export function importPackageHooks(core) {
   const packageJson = loadPackageJSON();
 
   if (!packageJson) {
@@ -130,7 +148,7 @@ export function importFromPackageJson(core) {
  * Loads hooks provided in core hooks config
  * @param core
  */
-export function importFromConfig(core) {
+export function importConfigHooks(core) {
   const packageHooks = Object.keys(core.options.hooks);
   const numHooks = packageHooks.length;
 
@@ -142,15 +160,13 @@ export function importFromConfig(core) {
   for (let i = 0; i < numHooks; i++) {
     const name = packageHooks[i];
     const value = core.options.hooks[name];
-    if (Array.isArray(value) && value.length) {
-      if (value.length === 1) {
-        core.setHookConfig(name, {});
-        promises.push(loadHook(value[0], name, core));
-      }
-      if (value.length === 2) {
-        core.setHookConfig(name, value[1]);
-        promises.push(loadHook(value[0], name, core));
-      }
+    // constructor
+    if (typeof value === 'function') {
+      promises.push(loadHook(value, name, core));
+    }
+    // package name - try load
+    if (typeof value === 'string') {
+      promises.push(loadHook(tryRequire(value), name, core));
     }
   }
 
@@ -167,7 +183,7 @@ export function importFromConfig(core) {
  * @returns {*}
  */
 export default core => Promise.all([
-  importFromPackageJson(core),
-  importFromConfig(core),
+  importConfigHooks(core),
+  importPackageHooks(core),
 ]);
 

@@ -1,16 +1,18 @@
 import EventEmitter from 'eventemitter3';
-import {} from './../helpers';
 
-class Hook extends EventEmitter {
+class BaseHook extends EventEmitter {
 
   constructor(name) {
     super();
     this.name = name.toLowerCase();
     this.core = null;
-    this.defaultClient = null;
+    this.client = null;
     this.clients = {};
     this.options = {};
+    this.hookTimeout = 10000; // 10s
     this._mounted = false;
+    this._mountToCore = false;
+    this._clientCount = 0;
   }
 
   /**
@@ -30,6 +32,14 @@ class Hook extends EventEmitter {
   }
 
   /**
+   * Returns the number of connections this hook has made
+   * @returns {Number}
+   */
+  getClientCount() {
+    return this._clientCount;
+  }
+
+  /**
    * Setup references to core, logger and the default client
    * @param core
    * @private
@@ -39,7 +49,7 @@ class Hook extends EventEmitter {
     // setup logger
     this.log = this.core.log;
     // setup the default client
-    this.defaultClient = this.core.clients.readWrite;
+    this.client = this.core.clients.default;
   }
 
   /**
@@ -50,17 +60,24 @@ class Hook extends EventEmitter {
    * @returns {*}
    */
   createClient(clientName, readOnly, readyCallback) {
-    return this.core.createClient(clientName, readOnly, readyCallback, this.clients);
+    return this.core.createClient(clientName, readOnly, readyCallback, this);
   }
 
   /**
    * Attach hook to the core.hooks namespace if not already mounted.
    * @private
-	 */
+   */
   _mount() {
     if (!this._mounted) {
-      // attach to hooks
-      this.core.hooks[this.name] = this;
+      // TODO reconnect client connections if from a previous unmount
+      if (this._mountToCore) {
+        // internal flag to make the mount point be on core.name
+        // rather than core.hooks.name
+        this.core[this.name] = this;
+      } else {
+        // attach to hooks
+        this.core.hooks[this.name] = this;
+      }
 
       // update mount state
       this._mounted = true;
@@ -74,7 +91,15 @@ class Hook extends EventEmitter {
    */
   _unmount() {
     if (this._mounted) {
-      this.core.hooks[this.name] = undefined;
+      // TODO quit client connections gracefully first
+      if (this._mountToCore) {
+        // internal flag to make the mount point be on core.name
+        // rather than core.hooks.name
+        delete this.core[this.name];
+      } else {
+        // attach to hooks
+        delete this.core.hooks[this.name];
+      }
       this._mounted = false;
       this._emitInternalEvent('unmount');
     }
@@ -91,8 +116,6 @@ class Hook extends EventEmitter {
     if (this.core) this.core.emit(this.toEventName(event, data));
   }
 
-
-
   /**
    * Add the eventPrefix to an event name
    * @param eventName
@@ -101,4 +124,4 @@ class Hook extends EventEmitter {
   toEventName = eventName => `hook:${this.name}:${eventName}`;
 }
 
-export default Hook;
+export default BaseHook;

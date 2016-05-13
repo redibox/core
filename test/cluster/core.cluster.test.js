@@ -2,10 +2,9 @@ import { assert } from 'chai';
 import RediBox from './../../src/core';
 
 const clusterConfig = {
-  log: { level: 'verbose' },
+  log: { level: 'debug' },
   redis: {
-    clusterScaleReads: false, // single client only
-    connectionTimeout: 3500,
+    connectionTimeout: 2000,
     hosts: [
       {
         host: '127.0.0.1',
@@ -44,53 +43,43 @@ const clusterConfig = {
  */
 
 describe('cluster', () => {
-  it('Should connect to a cluster and create an additional READONLY client', function testA(done) {
+  it('Should connect to a cluster and be able to read from slaves and masters', function testA(done) {
     this.timeout(4000);
     const config = clusterConfig;
-    config.redis.clusterScaleReads = true;
+    config.redis.scaleReads = 'all';
     const redibox = new RediBox(config, (err) => {
-      assert.isNull(err);
+      assert.isUndefined(err);
       assert.isTrue(redibox.options.redis.cluster);
-      assert.isDefined(redibox.clients.readWrite);
-      assert.isDefined(redibox.clients.readOnly);
+      assert.isDefined(redibox.clients.default);
+      assert.isDefined(redibox.client);
+      assert.isDefined(redibox.cluster.readMode(), 'all');
       redibox.quit();
       done();
     });
     redibox.on('error', (e) => {
-    });
-  });
-
-  it('Should connect to a cluster and create a single client only', function testB(done) {
-    const config = clusterConfig;
-    config.redis.clusterScaleReads = false;
-    const redibox = new RediBox(config, (err) => {
-      assert.isTrue(redibox.options.redis.cluster);
-      assert.isDefined(redibox.clients.readWrite);
-      assert.isUndefined(redibox.clients.readOnly);
-      assert.isNull(err);
-      redibox.quit();
-      done();
-    });
-    redibox.on('error', (e) => {
+      console.error(e);
     });
   });
 
   it('Should return an empty arrays of node addresses when not a cluster', function testB(done) {
     const redibox = new RediBox(() => {
       assert.isFalse(redibox.options.redis.cluster);
-      assert.deepEqual(redibox.clusterGetMasters(), []);
-      assert.deepEqual(redibox.clusterGetSlaves(), []);
-      assert.deepEqual(redibox.clusterGetNodes(), []);
+      assert.deepEqual(redibox.cluster.getMasters(), []);
+      assert.deepEqual(redibox.cluster.getSlaves(), []);
+      assert.deepEqual(redibox.cluster.getNodes(), []);
       done();
+    });
+    redibox.on('error', (e) => {
+      console.error(e);
     });
   });
 
   it('Should return an array of redis slave node addresses', function testB(done) {
     const redibox = new RediBox(clusterConfig, () => {
       assert.isTrue(redibox.options.redis.cluster);
-      assert.isObject(redibox.clients.readWrite.connectionPool.nodes.slave);
+      assert.isObject(redibox.clients.default.connectionPool.nodes.slave);
       const slavesExpected = ['127.0.0.1:30004', '127.0.0.1:30005', '127.0.0.1:30006'];
-      const slaves = redibox.clusterGetSlaves();
+      const slaves = redibox.cluster.getSlaves();
       assert.isArray(slaves);
       assert.equal(slaves.length, 3);
       assert.oneOf(slaves[0], slavesExpected);
@@ -99,14 +88,17 @@ describe('cluster', () => {
       redibox.quit();
       done();
     });
+    redibox.on('error', (e) => {
+      console.error(e);
+    });
   });
 
   it('Should return an array of redis master node addresses', function testB(done) {
     const redibox = new RediBox(clusterConfig, () => {
       assert.isTrue(redibox.options.redis.cluster);
-      assert.isObject(redibox.clients.readWrite.connectionPool.nodes.master);
+      assert.isObject(redibox.clients.default.connectionPool.nodes.master);
       const mastersExpected = ['127.0.0.1:30001', '127.0.0.1:30002', '127.0.0.1:30003'];
-      const masters = redibox.clusterGetMasters();
+      const masters = redibox.cluster.getMasters();
       assert.isArray(masters);
       assert.equal(masters.length, 3);
       assert.oneOf(masters[0], mastersExpected);
@@ -119,13 +111,13 @@ describe('cluster', () => {
 
   it('Should return an array of all redis node addresses', function testB(done) {
     const redibox = new RediBox(clusterConfig, () => {
-      assert.isTrue(redibox.options.redis.cluster);
-      assert.isObject(redibox.clients.readWrite.connectionPool.nodes.all);
+      assert.isTrue(redibox.cluster.isCluster());
+      assert.isObject(redibox.clients.default.connectionPool.nodes.all);
       const allExpected = [
         '127.0.0.1:30001', '127.0.0.1:30002', '127.0.0.1:30003',
         '127.0.0.1:30006', '127.0.0.1:30004', '127.0.0.1:30005',
       ];
-      const all = redibox.clusterGetNodes();
+      const all = redibox.cluster.getNodes();
       assert.isArray(all);
       assert.equal(all.length, 6);
       assert.oneOf(all[0], allExpected);

@@ -1,25 +1,17 @@
+import ClusterHook from './hooks/ClusterHook';
+import PubSubHook from './hooks/PubSubHook';
+
 /*
  Default Configuration
  */
 export default function () {
   return {
-    logRedisErrors: false,
     redis: {
-      // [START RediBox Config]
-      // enable the publisher client
-      publisher: true,
-
-      // enable the subscriber client
-      subscriber: true,
-
-      // prefix all PUBSUB events with this string
-      eventPrefix: 'rdb:',
-
-      // scale key reads to read only redis cluster nodes - only applies to cluster connections
-      clusterScaleReads: true,
-       // [END RediBox Config]
-
       // [START IORedis Config]
+
+      // key read mode redis cluster nodes - only applies to cluster connections
+      scaleReads: 'all', // https://github.com/luin/ioredis#read-write-splitting
+
       keyPrefix: 'rdb:',  // prefixes all keys created with this
       connectionTimeout: 6000,
       host: '127.0.0.1',
@@ -29,13 +21,20 @@ export default function () {
       // sentinels,
       // [END IORedis Config]
     },
+
     log: {
-      level: 'warn',
+      level: 'debug',
       label: 'RediBox',
       colorize: true,
       prettyPrint: true,
+      logRedisErrors: false,
       humanReadableUnhandledException: true,
     },
-    hooks: {},
+
+    hooks: {
+      // add core hooks, these can be overridden by user config if needed
+      cluster: ClusterHook,
+      pubsub: PubSubHook,
+    },
   };
 }

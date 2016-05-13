@@ -1,6 +1,6 @@
-import Hook from './../../src/hooks/hook';
+import BaseHook from './../../src/hooks/BaseHook';
 
-export default class CoolHook extends Hook {
+export default class CoolHook extends BaseHook {
   constructor() {
     // super with the hook name
     // also used for the hooks key name
@@ -19,18 +19,14 @@ export default class CoolHook extends Hook {
     // this.options - the user provided options pre-merged with defaults from this.defaults()
     // this.defaultClient -  the default redis client that redibox core uses
     // this.clients - where all this hooks custom redis clients live
-    return new Promise((resolve) => {
-      // options will have `kittenSays` and `explodingKittens`
-      this.log.info(this.options);
-      // create new redis client connections if needed
-      this.createClient('coolio', false, () => {
-        // you now have a client at 'this.clients.coolio'
-        resolve();
-      });
-    });
+    // options will have `kittenSays` and `explodingKittens`
+    this.log.info(this.options);
+    // create new redis client connections if needed
+    return this.createClient('coolio', this); // returns a promise
+    // you now have a client at 'this.clients.coolio'
   }
 
-	/**
+  /**
    * Return the default config - core will automatically merge this with the
    * user provided options for this hook.
    * @returns {{someDefaultThing: string}}
@@ -41,7 +37,7 @@ export default class CoolHook extends Hook {
     };
   }
 
-	/**
+  /**
    * Add whatever you want
    * @param bool
    */

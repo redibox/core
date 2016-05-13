@@ -18,7 +18,7 @@ describe('core', () => {
 
   it('Should callback when ready if a callback was provided', done => {
     const redibox = new RediBox((error, status) => {
-      assert.isNull(error);
+      assert.isUndefined(error);
       assert.isNotNull(status);
       redibox.quit();
       done();
@@ -46,23 +46,14 @@ describe('core', () => {
       done();
     });
 
-    assert.isDefined(redibox._redisError);
-    assert.isFalse(redibox.options.logRedisErrors);
+    assert.isDefined(redibox.handleError);
+    assert.isFalse(redibox.options.log.logRedisErrors);
     assert.isDefined(redibox.emit);
-    assert.isUndefined(redibox._redisError());
-    redibox._redisError('failFish');
+    assert.isUndefined(redibox.handleError());
+    redibox.handleError('failFish');
 
     // these don't exist on EE3 compared to nodes EE
     assert.isUndefined(redibox.listenerCount);
-  });
-
-  it('Should return original message if _tryJSONParse fails', done => {
-    const redibox = new RediBox();
-    const failJson = '{ boopBeep: failJsonString';
-    assert.isDefined(redibox._tryJSONParse);
-    assert.equal(failJson, redibox._tryJSONParse(failJson));
-    redibox.quit();
-    done();
   });
 
   it('Should connect to redis using default config', function testB(done) {
@@ -70,7 +61,7 @@ describe('core', () => {
     const redibox = new RediBox();
     redibox.once('ready', (status) => {
       assert.isNotNull(status);
-      redibox.getClient().get('test', (err) => {
+      redibox.client.get('test', (err) => {
         assert.isNull(err);
         redibox.quit();
         done();
@@ -103,42 +94,46 @@ describe('core', () => {
   });
 
   it('Should create a subscriber client if option set', done => {
-    const redibox = new RediBox({ redis: { subscriber: true } });
-    assert.isDefined(redibox.clients.subscriber);
-    redibox.quit();
-    done();
+    const redibox = new RediBox({ pubsub: { subscriber: true } });
+    redibox.on('ready', () => {
+      assert.isDefined(redibox.pubsub.clients.subscriber);
+      redibox.quit();
+      done();
+    });
   });
 
   it('Should create a publisher client if option set', done => {
-    const redibox = new RediBox({ redis: { publisher: true } });
-    assert.isDefined(redibox.clients.publisher);
-    redibox.quit();
-    done();
+    const redibox = new RediBox({ pubsub: { publisher: true } });
+    redibox.on('ready', () => {
+      assert.isDefined(redibox.pubsub.clients.publisher);
+      redibox.quit();
+      done();
+    });
   });
 
   it('Should be able to create custom clients using original config', done => {
     const redibox = new RediBox();
-    assert.equal(redibox.createClient('fooBob', () => {
+    redibox.createClient('fooBob', redibox).then(() => {
       assert.isDefined(redibox.clients.fooBob);
       assert.isTrue(redibox.isClientConnected(redibox.clients.fooBob));
       redibox.quit();
       done();
-    }).constructor.name, 'Redis');
+    });
   });
 
   it('TODO: Should be able to create custom clients using custom config', done => {
     const redibox = new RediBox();
-    assert.equal(redibox.createClient('fooBobCustom', () => {
+    redibox.createClient('fooBobCustom', redibox).then(() => {
       assert.isDefined(redibox.clients.fooBobCustom);
       assert.isTrue(redibox.isClientConnected(redibox.clients.fooBobCustom));
       redibox.quit();
       done();
-    }).constructor.name, 'Redis');
+    });
   });
 
   it('Should subscribeOnce and publish events from multiple channels', function testB(done) {
     this.timeout(1000);
-    const redibox = new RediBox();
+    const redibox = new RediBox({ pubsub: { subscriber: true } });
 
     redibox.on('error', (error) => {
       console.dir(error);
@@ -150,7 +145,7 @@ describe('core', () => {
     });
 
     redibox.once('ready', () => {
-      redibox.subscribeOnce([
+      redibox.pubsub.subscribeOnce([
         'requestID-123456:request:dataPart1',
         'requestID-123456:request:dataPart2',
         'requestID-123456:request:dataPart3',
@@ -160,7 +155,7 @@ describe('core', () => {
       }, error => { // on subscribed callback
         assert.isNull(error);
 
-        redibox.publish([
+        redibox.pubsub.publish([
           'requestID-123456:request:dataPart1',
           'requestID-123456:request:dataPart1', // twice to confirm once works
           'requestID-123456:request:dataPart2',
@@ -177,10 +172,10 @@ describe('core', () => {
     /* eslint no-var:0 */
     var listener;
     this.timeout(9000);
-    const redibox = new RediBox({ logRedisErrors: true });
+    const redibox = new RediBox({ logRedisErrors: true, pubsub: { subscriber: true } });
 
     const done10 = after(10, () => {
-      redibox.unsubscribe([
+      redibox.pubsub.unsubscribe([
         'requestID-123456:request:dataPart1',
         'requestID-123456:request:dataPart2',
         'requestID-123456:request:dataPart3',
@@ -196,14 +191,14 @@ describe('core', () => {
     };
 
     redibox.once('ready', () => {
-      redibox.subscribe([
+      redibox.pubsub.subscribe([
         'requestID-123456:request:dataPart1',
         'requestID-123456:request:dataPart2',
         'requestID-123456:request:dataPart3',
       ], listener, error => { // on subscribed callback
         assert.isNull(error);
 
-        redibox.publish([
+        redibox.pubsub.publish([
           // x3
           'requestID-123456:request:dataPart1',
           'requestID-123456:request:dataPart1',
