@@ -2,6 +2,39 @@
 import { assert } from 'chai';
 import RediBox, { after } from './../../src/core';
 
+const clusterConfig = {
+  log: { level: 'error' },
+  redis: {
+    connectionTimeout: 2000,
+    hosts: [
+      {
+        host: '127.0.0.1',
+        port: 30001,
+      },
+      {
+        host: '127.0.0.1',
+        port: 30002,
+      },
+      {
+        host: '127.0.0.1',
+        port: 30003,
+      },
+      {
+        host: '127.0.0.1',
+        port: 30004,
+      },
+      {
+        host: '127.0.0.1',
+        port: 30005,
+      },
+      {
+        host: '127.0.0.1',
+        port: 30006,
+      },
+    ],
+  },
+};
+
 describe('core hooks - cluster', () => {
   it('Should return an empty arrays of node addresses when not a cluster', function testB(done) {
     const redibox = new RediBox(() => {
