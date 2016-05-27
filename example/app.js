@@ -33,8 +33,7 @@ const RediBox = new Redibox({
 RediBox.on('error', console.error);
 RediBox.on('ready', () => {
   RediBox.log.info('I am ready.');
-
-  // we have a 'cool' hook.
+    // we have a 'cool' hook.
   RediBox.hooks.cool.isThisCoolOrWhat(true);
   RediBox.hooks.cool.isThisCoolOrWhat(false);
 });
