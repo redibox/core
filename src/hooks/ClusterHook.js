@@ -7,6 +7,16 @@ export default class ClusterHook extends BaseHook {
   constructor() {
     super('cluster');
     this._mountToCore = true;
+
+    // proxy commands to this.exec
+    return new Proxy(this, {
+      get(target, name) {
+        if (name in target) {
+          return target[name];
+        }
+        return (...args) => target.exec.apply(target, [name, ...args]);
+      },
+    });
   }
 
   /**

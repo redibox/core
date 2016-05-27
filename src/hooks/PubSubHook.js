@@ -1,10 +1,8 @@
 import BaseHook from './BaseHook';
-import each from 'async/each';
 import EventEmitter from 'eventemitter3';
 
 import {
   once,
-  noop,
   isObject,
   tryJSONParse,
   tryJSONStringify,
@@ -12,12 +10,10 @@ import {
 } from './../utils';
 
 /**
- * Provides pubsub utilities if in cluster mode
+ * Provides additional pubsub utilities
  */
 // TODO pattern subs
 // TODO subscribeXof
-// TODO drop async
-// TODO switch to promises
 export default class PubSubHook extends BaseHook {
   constructor() {
     super('pubsub');
@@ -42,15 +38,15 @@ export default class PubSubHook extends BaseHook {
 
     // subscriber client
     if (this.options.subscriber) {
-      promises.push(new Promise((resolve, reject) => {
+      promises.push(
         this
           .createClient('subscriber', this)
           .then(() => {
             this.clients.subscriber.on('message', this._onMessage);
             this.clients.subscriber.on('pmessage', this._onPatternMessage);
-            resolve();
-          }).catch(reject);
-      }));
+            return Promise.resolve();
+          })
+      );
     }
 
     // publisher client
@@ -129,25 +125,23 @@ export default class PubSubHook extends BaseHook {
   /**
    * Unsubscribe after a subOnce has completed.
    * @param channel
-   * @param completed
    * @private
    */
-  _unsubscribeAfterOnce(channel, completed = noop) {
+  _unsubscribeAfterOnce(channel) {
     const channelWithPrefix = this.prefixChannel(channel);
     this.log.debug(`Checking to see if we should unsub from channel '${channelWithPrefix}'.`);
-    this.client.pubsub('numsub', channelWithPrefix)
-        .then((countSubs) => {
-          this.log.debug(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
-          if (countSubs[1] <= 1) {
-            this.log.debug(`Unsubscribing from channel '${channelWithPrefix}'.`);
-            // need the original non-prefix name here as unsub already adds it.
-            return this.unsubscribe(channel, null, error => {
-              if (error) this.core.handleError(error);
-              return completed();
-            });
-          }
-          return completed();
-        }).catch(error => this.core.handleError(error) && completed());
+    return this
+      .client
+      .pubsub('numsub', channelWithPrefix)
+      .then((countSubs) => {
+        this.log.debug(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
+        if (countSubs[1] <= 1) {
+          this.log.debug(`Unsubscribing from channel '${channelWithPrefix}'.`);
+          // need the original non-prefix name here as unsub already adds it.
+          return this.unsubscribe(channel, null);
+        }
+        return Promise.resolve();
+      });
   }
 
   /**
@@ -156,73 +150,56 @@ export default class PubSubHook extends BaseHook {
    * @name subscribeOnce
    * @param channels {string|Array} an array of string of channels you want to subscribe to
    * @param listener {Function} your listener where the channel events will be sent to
-   * @param subscribed {Function} callback with subscription status
    * @param timeout {Number} time in ms until the subscription is aborted
-   * @example
-   *
-   * RediBox.subscribeOnce([
-   *    'requestID-123456:request:dataPart1',
-   *    'requestID-123456:request:dataPart2',
-   *    'requestID-123456:request:dataPart3',
-   * ], message => { // on message received listener
-   *     assert.isUndefined(message.timeout);
-   *     // do something with your messages here
-   * }, error => { // on subscribed callback
-   *     assert.isNull(error);
-   *
-   *     // send some test messages
-   *     RediBox.publish([
-   *         'requestID-123456:request:dataPart1', // will only get one of these
-   *         'requestID-123456:request:dataPart1', // will only get one of these
-   *         'requestID-123456:request:dataPart2',
-   *         'requestID-123456:request:dataPart3',
-   *     ], {
-   *         someArray: [1, 2, 3, 4, 5],
-   *        somethingElse: 'foobar',
-   *     });
-   *   }, 3000); // optional timeout
-   *
    */
-  subscribeOnce(channels, listener, subscribed, timeout) {
+  subscribeOnce(channels, listener, timeout) {
+    const promises = [];
     const channelArray = [].concat(channels); // no mapping here - need the original name
-    each(channelArray, (channel, subscribeOnceDone) => {
-      let timedOut = false;
-      let timeOutTimer;
-      const channelWithPrefix = this.prefixChannel(channel);
 
-      if (timeout) {
-        timedOut = false;
-        timeOutTimer = setTimeout(() => {
-          timedOut = true;
-          this._router.removeListener(channelWithPrefix, listener);
-          this._unsubscribeAfterOnce(channel, () => {
-            listener({
-              channel,
-              timeout: true,
-              timeoutPeriod: timeout,
-              data: null,
-              timestamp: getTimeStamp(),
-            });
-          });
-        }, timeout);
-      }
+    for (let i = 0, len = channelArray.length; i < len; i++) {
+      const channel = channelArray[i];
+      promises.push(new Promise((resolve, reject) => {
+        let timedOut = false;
+        let timeOutTimer;
+        const channelWithPrefix = this.prefixChannel(channel);
 
-      this.clients.subscriber.subscribe(channelWithPrefix, (subscribeError, count) => {
-        if (subscribeError) return subscribeOnceDone(subscribeError, count);
-        if (!timeout || !timedOut) {
-          this.log.debug(`Subscribed once to ${channelWithPrefix}`);
-          this._router.once(channelWithPrefix, (obj) => {
-            if (!timeout || !timedOut) {
-              clearTimeout(timeOutTimer);
-              this._unsubscribeAfterOnce(channel, () => {
-                listener(obj);
+        if (timeout) {
+          timedOut = false;
+          timeOutTimer = setTimeout(() => {
+            timedOut = true;
+            this._router.removeListener(channelWithPrefix, listener);
+            this._unsubscribeAfterOnce(channel, () => {
+              listener({
+                channel,
+                timeout: true,
+                timeoutPeriod: timeout,
+                data: null,
+                timestamp: getTimeStamp(),
               });
-            }
-          });
+            });
+          }, timeout);
         }
-        return subscribeOnceDone();
-      });
-    }, subscribed);
+
+        this.clients.subscriber.subscribe(channelWithPrefix).then(() => {
+          if (!timeout || !timedOut) {
+            this.log.debug(`Subscribed once to ${channelWithPrefix}`);
+            this._router.once(channelWithPrefix, (obj) => {
+              if (!timeout || !timedOut) {
+                clearTimeout(timeOutTimer);
+                this._unsubscribeAfterOnce(channel).then(() => {
+                  listener(obj);
+                });
+              }
+            });
+          }
+          return resolve();
+        }).catch(reject);
+      }));
+    }
+
+    if (!promises.length) return Promise.resolve();
+    if (promises.length === 1) return promises[0];
+    return Promise.all(promises);
   }
 
   /**
@@ -231,19 +208,16 @@ export default class PubSubHook extends BaseHook {
    * @name subscribeOnceOf
    * @param channels {string|Array} an array of string of channels you want to subscribe to
    * @param listener {Function} your listener where the channel events will be sent to
-   * @param subscribed {Function} callback with subscription status
    * @param timeout {Number} time in ms until the subscription is aborted
    */
-  subscribeOnceOf(channels, listener, subscribed, timeout) {
+  subscribeOnceOf(channels, listener, timeout) {
     let timeOutTimer = null;
     // create an internal listener to wrap around the provided listener
     // this will unsubscribe on the first event
     const listenerWrapper = once((message) => {
       if (timeOutTimer) clearTimeout(timeOutTimer);
-      this.unsubscribe(channels, listenerWrapper, () => listener(message));
+      this.unsubscribe(channels, listenerWrapper).then(() => listener(message));
     });
-
-    this.subscribe(channels, listenerWrapper, subscribed);
 
     if (timeout) {
       timeOutTimer = setTimeout(() => {
@@ -255,22 +229,22 @@ export default class PubSubHook extends BaseHook {
         });
       }, timeout + 50);
     }
+
+    return this.subscribe(channels, listenerWrapper);
   }
 
   /**
    * Subscribe to a redis channel(s)
    * @param channels {string|Array} an array of string of channels you want to subscribe to
    * @param listener {Function} your listener where the channel events will be sent to
-   * @param subscribed {Function} callback with subscription status
    */
-  subscribe(channels, listener, subscribed = noop) {
+  subscribe(channels, listener) {
     const channelsArray = [].concat(channels).map(this.prefixChannel);
-    this.clients.subscriber.subscribe(...channelsArray, (subscribeError, count) => {
-      if (subscribeError) return subscribed(subscribeError, count);
-      return each(channelsArray, (channel, subscribeDone) => {
-        this._router.on(channel, listener);
-        return subscribeDone();
-      }, subscribed);
+    return this.clients.subscriber.subscribe(...channelsArray).then(() => {
+      for (let i = 0, len = channelsArray.length; i < len; i++) {
+        this._router.on(channelsArray[i], listener);
+      }
+      return Promise.resolve();
     });
   }
 
@@ -278,48 +252,40 @@ export default class PubSubHook extends BaseHook {
    * Publish a message to all channels specified
    * @param channels {string|Array}
    * @param message
-   * @param published
    */
-  publish(channels, message, published = noop) {
+  publish(channels, message) {
     let messageStringified;
-    const channelsArray = [].concat(channels).map(this.prefixChannel);
 
     if (isObject(message) || Array.isArray(message)) {
       messageStringified = tryJSONStringify(message);
-      if (messageStringified === undefined) {
-        this.core.handleError('Cannot JSON stringify message.');
-        return published('Cannot JSON stringify message.');
-      }
     } else {
       messageStringified = message;
     }
 
-    return each(channelsArray, (channel, publishedToChannel) => {
-      this.clients.publisher.publish(channel, messageStringified, publishedToChannel);
-    }, published);
+    if (typeof channels === 'string') {
+      this.clients.publisher.publish(this.prefixChannel(channels), messageStringified);
+    } else if (Array.isArray(channels)) {
+      for (let i = 0, len = channels.length; i < len; i++) {
+        this.clients.publisher.publish(this.prefixChannel(channels[i]), messageStringified);
+      }
+    }
   }
 
   /**
    * Unsubscribe
    * @param channels {string|Array}
    * @param listener
-   * @param completed
    */
-  unsubscribe(channels, listener, completed = noop) {
+  unsubscribe(channels, listener) {
     const channelsArray = [].concat(channels).map(this.prefixChannel);
 
     if (listener) {
-      each(channelsArray, (channel, unsubscribed) => {
-        this._router.removeListener(channel, listener);
-        return unsubscribed();
-      }, noop);
+      for (let i = 0, len = channelsArray.length; i < len; i++) {
+        this._router.removeListener(channelsArray[i], listener);
+      }
     }
 
-    this.clients.subscriber.unsubscribe(...channelsArray, (err, count) => {
-      if (err) return completed(err, count);
-      this.log.debug(`Unsubscribed from ${channelsArray.toString()}`);
-      return completed();
-    });
+    return this.clients.subscriber.unsubscribe(...channelsArray);
   }
 
   /**
