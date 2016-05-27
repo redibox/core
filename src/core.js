@@ -159,6 +159,8 @@ export default class RediBox extends EventEmitter {
       target.emit(readyEvent);
     });
 
+    client.on('error', this.handleError);
+
     // attach to target
     if (!target.clients) target.clients = {};
     if (!target._clientCount) target._clientCount = 0;
@@ -218,6 +220,7 @@ export default class RediBox extends EventEmitter {
     process.removeListener('SIGINT', this.quit);
   }
 
+  // noinspection JSMethodCanBeStatic
   /**
    * Checks if a redis client connection is ready.
    * @returns {Boolean} Client status
