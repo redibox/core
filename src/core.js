@@ -94,7 +94,7 @@ export default class RediBox extends EventEmitter {
       }, this.handleError);
     });
 
-    this.createClient('default', this);
+    this.createClient('default');
     process.once('SIGTERM', this.quit);
     process.once('SIGINT', this.quit);
   }
@@ -294,23 +294,6 @@ export default class RediBox extends EventEmitter {
       return void 0;
     });
   }
-
-  /**
-   * TODO avast ye code lubbers, it all be wrong yaaaarggh
-   * @param command
-   * @private
-   */
-  _customCommandWrapper = (command) => (...args) => {
-    if (!this.isClientConnected(this.client)) {
-      return Promise.reject('Redis not connected or ready.');
-    }
-
-    if (!this.client[command]) {
-      return Promise.reject('Cannot find the specified command on any connected clients.');
-    }
-
-    return this.client[command].apply(null, args);
-  };
 
   /**
    * Update a hooks config options

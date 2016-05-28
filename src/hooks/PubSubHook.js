@@ -168,7 +168,7 @@ export default class PubSubHook extends BaseHook {
           timeOutTimer = setTimeout(() => {
             timedOut = true;
             this._router.removeListener(channelWithPrefix, listener);
-            this._unsubscribeAfterOnce(channel, () => {
+            this._unsubscribeAfterOnce(channel).then(() => {
               listener({
                 channel,
                 timeout: true,
@@ -197,7 +197,6 @@ export default class PubSubHook extends BaseHook {
       }));
     }
 
-    if (!promises.length) return Promise.resolve();
     if (promises.length === 1) return promises[0];
     return Promise.all(promises);
   }

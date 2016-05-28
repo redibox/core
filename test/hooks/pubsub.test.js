@@ -56,6 +56,56 @@ describe('core hooks - pubsub', () => {
     });
   });
 
+
+  it('Should subscribeOnce and timeout if option set', function testB(done) {
+    this.timeout(3000);
+    const redibox = new RediBox({ pubsub: { subscriber: true } });
+
+    redibox.on('error', (error) => {
+      console.dir(error);
+    });
+
+    const done1 = after(1, () => {
+      redibox.disconnect();
+      done();
+    });
+
+    redibox.once('ready', () => {
+      redibox.pubsub.subscribeOnce([
+        'requestID-123456:request:dataPart1',
+      ], message => { // on message received listener
+        assert.isDefined(message.timeout);
+        done1();
+      }, 50).then(() => {
+      }).catch(error => assert.isNull(error));
+    });
+  });
+
+  it('Should subscribeOnceOf and timeout if option set', function testB(done) {
+    this.timeout(3000);
+    const redibox = new RediBox({ pubsub: { subscriber: true } });
+
+    redibox.on('error', (error) => {
+      console.dir(error);
+    });
+
+    const done1 = after(1, () => {
+      redibox.disconnect();
+      done();
+    });
+
+    redibox.once('ready', () => {
+      redibox.pubsub.subscribeOnceOf([
+        'requestID-123456:request:dataPart1',
+        'requestID-123456:request:dataPart2',
+      ], message => { // on message received listener
+        assert.isDefined(message.timeout);
+        done1();
+      }, 50).then(() => {
+      }).catch(error => assert.isNull(error));
+    });
+  });
+
   it('Should subscribe and publish events from multiple channels many times', function testB(done) {
     /* eslint no-var:0 */
     var listener;
@@ -92,7 +142,6 @@ describe('core hooks - pubsub', () => {
           // x3
           'requestID-123456:request:dataPart2',
           'requestID-123456:request:dataPart2',
-          'requestID-123456:request:dataPart2',
           // x3
           'requestID-123456:request:dataPart3',
           'requestID-123456:request:dataPart3',
@@ -101,6 +150,7 @@ describe('core hooks - pubsub', () => {
           somethingElse: 'foobar',
         });
         redibox.pubsub.publish('requestID-123456:request:dataPart3', []);
+        redibox.pubsub.publish('requestID-123456:request:dataPart2', 'hello');
       });
     });
   });
