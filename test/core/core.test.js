@@ -1,6 +1,6 @@
 /* eslint no-underscore-dangle: 0 */
 import { assert } from 'chai';
-import RediBox, { after } from './../../src/core';
+import RediBox from './../../src';
 
 describe('core', () => {
   it('Should error when connecting to a offline redis server', function testA(done) {

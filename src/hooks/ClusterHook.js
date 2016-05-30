@@ -87,12 +87,9 @@ export default class ClusterHook extends BaseHook {
    */
   getNodeClient(address) {
     if (!this.isCluster()) {
-      return false;
+      return void 0;
     }
-    if (this.client.connectionPool.nodes.all.hasOwnProperty(address)) {
-      return this.client.connectionPool.all[address];
-    }
-    return false;
+    return this.client.connectionPool.nodes.all[address];
   }
 
   /**

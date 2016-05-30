@@ -53,7 +53,9 @@ export function getTimeStamp() {
   if (!_timestamp || ++_ncalls > 1000) {
     _timestamp = Date.now();
     _ncalls = 0;
-    setTimeout(() => { _timestamp = null; }, 50);
+    setTimeout(() => {
+      _timestamp = null;
+    }, 50);
   }
   return _timestamp;
 }
@@ -65,13 +67,13 @@ export function getTimeStamp() {
  * @returns {Function}
  */
 export function throttle(func, limit) {
-  let wait = false;                  // Initially, we're not waiting
-  return function _throttle(...args) {               // We return a throttled function
-    if (!wait) {                   // If we're not waiting
-      func.call(this, ...args);           // Execute users function
-      wait = true;               // Prevent future invocations
-      setTimeout(() => {   // After a period of time
-        wait = false;          // And allow future invocations
+  let wait = false;                    // Initially, we're not waiting
+  return function _throttle(...args) { // We return a throttled function
+    if (!wait) {                       // If we're not waiting
+      func.call(this, ...args);        // Execute function
+      wait = true;                     // Prevent future invocations
+      setTimeout(() => {               // After a period of time
+        wait = false;                  // And allow future invocations
       }, limit);
     }
   };
@@ -219,6 +221,14 @@ export function mergeDeep(target, source) {
     });
   }
   return target;
+}
+
+export function arrayChunks(array, chunkSize) {
+  const results = [];
+  for (let i = 0, len = array.length; i < len; i += chunkSize) {
+    results.push(array.slice(i, i + chunkSize));
+  }
+  return results;
 }
 
 /**

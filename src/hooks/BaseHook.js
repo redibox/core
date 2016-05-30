@@ -4,15 +4,15 @@ class BaseHook extends EventEmitter {
 
   constructor(name) {
     super();
-    this.name = name.toLowerCase();
-    this.core = null;
-    this.client = null;
+    this.core = {};
+    this.client = {};
     this.clients = {};
     this.options = {};
-    this.hookTimeout = 10000; // 10s
-    this._mounted = false;
-    this._mountToCore = false;
     this._clientCount = 0;
+    this._mounted = false;
+    this.hookTimeout = 10000; // 10s
+    this._mountToCore = false;
+    this.name = name.toLowerCase();
   }
 
   /**
@@ -45,10 +45,11 @@ class BaseHook extends EventEmitter {
    * @private
    */
   _setCore(core) {
+    // setup redibox core ref
     this.core = core;
-    // setup logger
+    // setup logger ref
     this.log = this.core.log;
-    // setup the default client
+    // setup the default client ref
     this.client = this.core.clients.default;
   }
 

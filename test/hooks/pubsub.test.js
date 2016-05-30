@@ -1,13 +1,13 @@
 /* eslint no-underscore-dangle: 0 */
 import { assert } from 'chai';
-import RediBox, { after } from './../../src/core';
+import RediBox, { after } from './../../src';
 
 describe('core hooks - pubsub', () => {
   it('Should create a subscriber client if option set', done => {
     const redibox = new RediBox({ pubsub: { subscriber: true } });
     redibox.on('ready', () => {
       assert.isDefined(redibox.pubsub.clients.subscriber);
-      redibox.quit();
+      redibox.disconnect();
       done();
     });
   });
@@ -16,7 +16,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { publisher: true } });
     redibox.on('ready', () => {
       assert.isDefined(redibox.pubsub.clients.publisher);
-      redibox.quit();
+      redibox.disconnect();
       done();
     });
   });
@@ -58,7 +58,7 @@ describe('core hooks - pubsub', () => {
 
 
   it('Should subscribeOnce and timeout if option set', function testB(done) {
-    this.timeout(3000);
+    this.timeout(500);
     const redibox = new RediBox({ pubsub: { subscriber: true } });
 
     redibox.on('error', (error) => {
@@ -76,13 +76,13 @@ describe('core hooks - pubsub', () => {
       ], message => { // on message received listener
         assert.isDefined(message.timeout);
         done1();
-      }, 50).then(() => {
+      }, 25).then(() => {
       }).catch(error => assert.isNull(error));
     });
   });
 
   it('Should subscribeOnceOf and timeout if option set', function testB(done) {
-    this.timeout(3000);
+    this.timeout(500);
     const redibox = new RediBox({ pubsub: { subscriber: true } });
 
     redibox.on('error', (error) => {
@@ -101,7 +101,7 @@ describe('core hooks - pubsub', () => {
       ], message => { // on message received listener
         assert.isDefined(message.timeout);
         done1();
-      }, 50).then(() => {
+      }, 25).then(() => {
       }).catch(error => assert.isNull(error));
     });
   });

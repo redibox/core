@@ -1,6 +1,6 @@
 /* eslint no-underscore-dangle: 0 */
 import { assert } from 'chai';
-import RediBox, { after } from './../../src/core';
+import RediBox from './../../src';
 
 const clusterConfig = {
   log: { level: 'error' },
@@ -60,7 +60,7 @@ describe('core hooks - cluster', () => {
       assert.oneOf(slaves[0], slavesExpected);
       assert.oneOf(slaves[1], slavesExpected);
       assert.oneOf(slaves[2], slavesExpected);
-      redibox.quit();
+      redibox.disconnect();
       done();
     });
     redibox.on('error', (e) => {
@@ -79,8 +79,11 @@ describe('core hooks - cluster', () => {
       assert.oneOf(masters[0], mastersExpected);
       assert.oneOf(masters[1], mastersExpected);
       assert.oneOf(masters[2], mastersExpected);
-      redibox.quit();
+      redibox.disconnect();
       done();
+    });
+    redibox.on('error', (e) => {
+      console.error(e);
     });
   });
 
@@ -101,11 +104,27 @@ describe('core hooks - cluster', () => {
       assert.oneOf(all[3], allExpected);
       assert.oneOf(all[4], allExpected);
       assert.oneOf(all[5], allExpected);
-      redibox.quit();
+     // redibox.disconnect();
       done();
+    });
+    redibox.on('error', (e) => {
+      console.error(e);
     });
   });
 
+  // TODO - accessing an individual redis node breaks ioredis - wut o.O
+  it('Should return an individual cluster node connection', function testB(done) {
+    const redibox = new RediBox(clusterConfig, () => {
+      console.log('I BE HERE TO BE SURE')
+      const node1 = redibox.cluster.getNodeClient('127.0.0.1:30001');
+      // NEVER GETS HERE, just hangs or disconnects
+      assert.equal(node1.options.port, 30001);
+      done();
+    });
+    redibox.on('error', (e) => {
+      console.error(e);
+    });
+  });
 
   it('Should proxy redis commands to all redis node masters', function testB(done) {
     const redibox = new RediBox(clusterConfig, () => {
@@ -115,7 +134,7 @@ describe('core hooks - cluster', () => {
         assert.equal(result[0], 'OK');
         assert.equal(result[1], 'OK');
         assert.equal(result[2], 'OK');
-        redibox.quit();
+        redibox.disconnect();
         done();
       });
     });

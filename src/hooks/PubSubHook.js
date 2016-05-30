@@ -43,7 +43,7 @@ export default class PubSubHook extends BaseHook {
           .createClient('subscriber', this)
           .then(() => {
             this.clients.subscriber.on('message', this._onMessage);
-            this.clients.subscriber.on('pmessage', this._onPatternMessage);
+            // this.clients.subscriber.on('pmessage', this._onPatternMessage);
             return Promise.resolve();
           })
       );
@@ -103,24 +103,24 @@ export default class PubSubHook extends BaseHook {
    * @param message
    * @private
    */
-  _onPatternMessage = (pattern, channel, message) => {
-    if (this._router.listeners(channel, true)) {
-      this._router.emit(channel, {
-        data: tryJSONParse(message),
-        channel: this.removeEventPrefix(channel),
-        pattern,
-        timestamp: getTimeStamp(),
-      });
-    }
-    if (pattern !== channel && this._router.listeners(channel, true) > 0) {
-      this._router.emit(pattern, {
-        data: tryJSONParse(message),
-        channel: this.removeEventPrefix(channel),
-        pattern,
-        timestamp: getTimeStamp(),
-      });
-    }
-  };
+  // _onPatternMessage = (pattern, channel, message) => {
+  //   if (this._router.listeners(channel, true)) {
+  //     this._router.emit(channel, {
+  //       data: tryJSONParse(message),
+  //       channel: this.removeEventPrefix(channel),
+  //       pattern,
+  //       timestamp: getTimeStamp(),
+  //     });
+  //   }
+  //   if (pattern !== channel && this._router.listeners(channel, true) > 0) {
+  //     this._router.emit(pattern, {
+  //       data: tryJSONParse(message),
+  //       channel: this.removeEventPrefix(channel),
+  //       pattern,
+  //       timestamp: getTimeStamp(),
+  //     });
+  //   }
+  // };
 
   /**
    * Unsubscribe after a subOnce has completed.
@@ -128,20 +128,21 @@ export default class PubSubHook extends BaseHook {
    * @private
    */
   _unsubscribeAfterOnce(channel) {
-    const channelWithPrefix = this.prefixChannel(channel);
-    this.log.debug(`Checking to see if we should unsub from channel '${channelWithPrefix}'.`);
-    return this
-      .client
-      .pubsub('numsub', channelWithPrefix)
-      .then((countSubs) => {
-        this.log.debug(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
-        if (countSubs[1] <= 1) {
-          this.log.debug(`Unsubscribing from channel '${channelWithPrefix}'.`);
-          // need the original non-prefix name here as unsub already adds it.
-          return this.unsubscribe(channel, null);
-        }
-        return Promise.resolve();
-      });
+    return this.unsubscribe(channel, null);
+    // const channelWithPrefix = this.prefixChannel(channel);
+    // this.log.debug(`Checking to see if we should unsub from channel '${channelWithPrefix}'.`);
+    // return this
+    //   .client
+    //   .pubsub('numsub', channelWithPrefix)
+    //   .then((countSubs) => {
+        // TODO this logic doesn't seem to be working
+        // TODO sub count always seems to be above 2
+        // this.log.debug(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
+        // if (countSubs[1] <= 1) {
+        //   this.log.debug(`Unsubscribing from channel '${channelWithPrefix}'.`);
+        //   // need the original non-prefix name here as unsub already adds it.
+        // }
+      // });
   }
 
   /**
@@ -173,7 +174,6 @@ export default class PubSubHook extends BaseHook {
                 channel,
                 timeout: true,
                 timeoutPeriod: timeout,
-                data: null,
                 timestamp: getTimeStamp(),
               });
             });
@@ -226,7 +226,7 @@ export default class PubSubHook extends BaseHook {
           message: null,
           timestamp: getTimeStamp(),
         });
-      }, timeout + 50);
+      }, timeout);
     }
 
     return this.subscribe(channels, listenerWrapper);

@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import RediBox from './../../src/core';
+import RediBox from './../../src';
 
 const clusterConfig = {
   log: { level: 'error' },

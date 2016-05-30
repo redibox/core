@@ -41,9 +41,6 @@ import {
 
 const HOST_NAME = hostname();
 
-export * from './utils';
-export { defaults };
-
 export default class RediBox extends EventEmitter {
 
   /**
@@ -82,16 +79,18 @@ export default class RediBox extends EventEmitter {
 
     // https://github.com/luin/ioredis#error-handling
     Redis.Promise.onPossiblyUnhandledRejection(this.handleError);
+    Promise.onPossiblyUnhandledRejection(this.handleError);
 
     this.once(this.toEventName('client:default:ready'), () => {
       clearTimeout(connectionFailedTimer);
       // create a ref to default client for niceness
       this.client = this.clients.default;
-      hookLoader(this).then(() => {
-        this.trumpWall();
-        this.emit('ready');
-        callback();
-      }, this.handleError);
+      hookLoader(this)
+        .then(() => {
+          this.trumpWall();
+          this.emit('ready');
+          callback();
+        }, this.handleError).catch(this.handleError);
     });
 
     this.createClient('default');
