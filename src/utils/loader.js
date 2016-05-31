@@ -30,6 +30,11 @@ function loadHook(UserHook, keyName, core) {
       return resolve();
     }
 
+    // add support for es6 default
+    if (UserHook.default) {
+      UserHook = UserHook.default;
+    }
+
     if (typeof UserHook !== 'function') {
       core.log.warn(`Hook '${keyName}': is not a constructor, skipping!`);
       return resolve();

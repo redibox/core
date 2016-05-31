@@ -12,7 +12,6 @@ const RediBox = new Redibox({
     publisher: true,
   },
 
-
   // pass in an object of hooks
   // this is only needed if these hooks are not npm packages.
   // Any npm dependencies in your package.json file that start with
@@ -33,7 +32,7 @@ const RediBox = new Redibox({
 RediBox.on('error', console.error);
 RediBox.on('ready', () => {
   RediBox.log.info('I am ready.');
-    // we have a 'cool' hook.
+  // we have a 'cool' hook.
   RediBox.hooks.cool.isThisCoolOrWhat(true);
   RediBox.hooks.cool.isThisCoolOrWhat(false);
   console.log(RediBox.hooks.cool.getClientCount());
