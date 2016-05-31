@@ -46,13 +46,18 @@ function loadHook(UserHook, keyName, core) {
     const userHook = new UserHook();
     const hookName = userHook.name;
     const defaults = userHook.defaults() || {};
+    const scripts = userHook.scripts() || {};
     const hookUserConfig = core.options[keyName];
+    core.scripts = Object.assign({}, core.scripts, scripts);
 
     // setup core ref
     userHook._setCore(core);
 
     // attach hook to core.hooks
     userHook._mount(core);
+
+    // setup scripts
+    core.defineLuaCommands(core.scripts, core.client);
 
     // set options merged with the provided defaults
     if (!Array.isArray(hookUserConfig) && typeof hookUserConfig === 'object') {

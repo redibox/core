@@ -11,7 +11,7 @@ export default function () {
 
       // key read mode redis cluster nodes - only applies to cluster connections
       scaleReads: 'all', // https://github.com/luin/ioredis#read-write-splitting
-      dropBufferSupport: true, // https://github.com/luin/ioredis/wiki/Improve-Performance#dropbuffersupport-option
+      dropBufferSupport: false, // https://github.com/luin/ioredis/wiki/Improve-Performance#dropbuffersupport-option
       keyPrefix: 'rdb:',  // prefixes all keys created with this
       connectionTimeout: 6000,
       host: '127.0.0.1',

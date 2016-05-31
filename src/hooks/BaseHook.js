@@ -32,6 +32,14 @@ class BaseHook extends EventEmitter {
   }
 
   /**
+   * Stub function to return scripts for the hook
+   * @returns {{}}
+   */
+  scripts() {
+    return {};
+  }
+
+  /**
    * Returns the number of connections this hook has made
    * @returns {Number}
    */

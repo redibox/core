@@ -62,6 +62,7 @@ export default class RediBox extends EventEmitter {
     this.id = cuid();
     this.hooks = {};
     this.clients = {};
+    this.scripts = {};
     this._hooksCount = 0;
     this._clientCount = 0;
     this._allClientCount = 0;
@@ -79,7 +80,6 @@ export default class RediBox extends EventEmitter {
 
     // https://github.com/luin/ioredis#error-handling
     Redis.Promise.onPossiblyUnhandledRejection(this.handleError);
-    Promise.onPossiblyUnhandledRejection(this.handleError);
 
     this.once(this.toEventName('client:default:ready'), () => {
       clearTimeout(connectionFailedTimer);
@@ -155,6 +155,9 @@ export default class RediBox extends EventEmitter {
 
     client.once('ready', () => {
       this.log.debug(`Redis client '${name}' is ready!`);
+      // add scripts
+      this.defineLuaCommands(this.scripts, client);
+      // ready
       target.emit(readyEvent);
     });
 
@@ -261,30 +264,30 @@ export default class RediBox extends EventEmitter {
   /**
    * Defines a lua command or commands on both clients;
    * @param customScripts
-   * @param source what hook module is trying to load this
+   * @param client
    * @returns {*}
    */
-  defineLuaCommands(customScripts, source = 'core') {
+  defineLuaCommands(customScripts, client) {
     Object.keys(customScripts).forEach((key) => {
       const script = customScripts[key];
       const keyLower = key.toLowerCase();
       // quick validations
       if (!script.hasOwnProperty('keys')) {
         return this.log.warn(
-          `Script '${keyLower}' from '${source} is missing required property 'key'! ...SKIPPED!`
+          `Script '${keyLower}' is missing required property 'key'! ...SKIPPED!`
         );
       }
 
       if (!script.hasOwnProperty('lua')) {
         return this.log.warn(
-          `Script '${keyLower}' from '${source} is missing required property 'lua'! ...SKIPPED!`
+          `Script '${keyLower}' from is missing required property 'lua'! ...SKIPPED!`
         );
       }
 
       // default instance
-      if (!this.clients.default.hasOwnProperty(keyLower)) {
-        this.log.debug(`Defining command for lua script '${keyLower}' from module '${module}'.`);
-        this.clients.default.defineCommand(keyLower, {
+      if (!client.hasOwnProperty(keyLower)) {
+        this.log.debug(`Defining command for lua script '${keyLower}'.`);
+        client.defineCommand(keyLower, {
           numberOfKeys: script.keys,
           lua: script.lua,
         });
