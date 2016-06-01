@@ -110,7 +110,7 @@ function loadHook(UserHook, keyName, core) {
  */
 export function importPackageHooks(core) {
   const packageJson = loadPackageJSON();
-
+  debugger;
   if (!packageJson) {
     core.log.debug('Hook loader could not find a valid package.json file.');
     core.log.debug('Hook loading skipped!');
@@ -138,11 +138,10 @@ export function importPackageHooks(core) {
     const packageName = dependencies[i];
     if (packageName.indexOf(hookPrefix) !== -1) {
       const name = packageName.replace(hookRegexReplace, '');
-      // todo check not disabled in config
-      if (core.options.hooks[name] && core.options.hooks[name] !== false) {
+      if (!core.options.hooks[name] && core.options.hooks[name] !== false) {
         promises.push(loadHook(tryRequire(packageName), name, core));
       } else {
-        core.log.debug(`Hook '${name}': in package.json but disabled in core config, skipping.`);
+        core.log.warn(`Hook '${name}': in package.json but disabled in core config, skipping.`);
       }
     }
   }
