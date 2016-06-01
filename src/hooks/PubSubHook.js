@@ -135,14 +135,14 @@ export default class PubSubHook extends BaseHook {
     //   .client
     //   .pubsub('numsub', channelWithPrefix)
     //   .then((countSubs) => {
-        // TODO this logic doesn't seem to be working
-        // TODO sub count always seems to be above 2
-        // this.log.debug(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
-        // if (countSubs[1] <= 1) {
-        //   this.log.debug(`Unsubscribing from channel '${channelWithPrefix}'.`);
-        //   // need the original non-prefix name here as unsub already adds it.
-        // }
-      // });
+    // TODO this logic doesn't seem to be working
+    // TODO sub count always seems to be above 2
+    // this.log.debug(`Channel '${channelWithPrefix}' subscriber count is ${countSubs[1]}.`);
+    // if (countSubs[1] <= 1) {
+    //   this.log.debug(`Unsubscribing from channel '${channelWithPrefix}'.`);
+    //   // need the original non-prefix name here as unsub already adds it.
+    // }
+    // });
   }
 
   /**
@@ -154,6 +154,11 @@ export default class PubSubHook extends BaseHook {
    * @param timeout {Number} time in ms until the subscription is aborted
    */
   subscribeOnce(channels, listener, timeout) {
+    if (!this.options.subscriber) {
+      return Promise.reject(
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+      );
+    }
     const promises = [];
     const channelArray = [].concat(channels); // no mapping here - need the original name
 
@@ -210,6 +215,12 @@ export default class PubSubHook extends BaseHook {
    * @param timeout {Number} time in ms until the subscription is aborted
    */
   subscribeOnceOf(channels, listener, timeout) {
+    if (!this.options.subscriber) {
+      return Promise.reject(
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+      );
+    }
+
     let timeOutTimer = null;
     // create an internal listener to wrap around the provided listener
     // this will unsubscribe on the first event
@@ -238,6 +249,12 @@ export default class PubSubHook extends BaseHook {
    * @param listener {Function} your listener where the channel events will be sent to
    */
   subscribe(channels, listener) {
+    if (!this.options.subscriber) {
+      return Promise.reject(
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+      );
+    }
+
     const channelsArray = [].concat(channels).map(this.prefixChannel);
     return this.clients.subscriber.subscribe(...channelsArray).then(() => {
       for (let i = 0, len = channelsArray.length; i < len; i++) {
@@ -253,6 +270,10 @@ export default class PubSubHook extends BaseHook {
    * @param message
    */
   publish(channels, message) {
+    if (!this.options.publisher) {
+      throw new Error('RediBox.pubsub \'publisher\' config is set to disabled.');
+    }
+
     let messageStringified;
 
     if (isObject(message) || Array.isArray(message)) {
