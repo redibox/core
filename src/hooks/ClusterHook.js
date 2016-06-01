@@ -14,6 +14,10 @@ export default class ClusterHook extends BaseHook {
         if (name in target) {
           return target[name];
         }
+
+        // Fixes issue in chrome debugger & jam3/devtool
+        if (name === 'inspect') return undefined;
+
         return (...args) => target.exec.apply(target, [name, ...args]);
       },
     });
