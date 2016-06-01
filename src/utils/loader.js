@@ -110,7 +110,7 @@ function loadHook(UserHook, keyName, core) {
  */
 export function importPackageHooks(core) {
   const packageJson = loadPackageJSON();
-  debugger;
+
   if (!packageJson) {
     core.log.debug('Hook loader could not find a valid package.json file.');
     core.log.debug('Hook loading skipped!');
