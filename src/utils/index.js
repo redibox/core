@@ -26,7 +26,7 @@
 
 import { Logger, transports } from 'winston';
 import { createHash } from 'crypto';
-import { sep, join } from 'path';
+import { sep, join, resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { encode, decode } from 'json-simple';
 
@@ -273,6 +273,14 @@ export function loadPackageJSON(root = process.cwd()) {
 
   if (existsSync(file)) {
     return tryJSONParse(readFileSync(file));
+  }
+
+  // try go up one and look for a package.json
+  // mainly for projects that compile to a sub folder in the project root.
+  const fileUp = join(resolve(root, './../'), 'package.json');
+
+  if (existsSync(fileUp)) {
+    return tryJSONParse(readFileSync(fileUp));
   }
 
   return undefined;
