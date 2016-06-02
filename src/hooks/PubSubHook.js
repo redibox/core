@@ -289,6 +289,8 @@ export default class PubSubHook extends BaseHook {
         this.clients.publisher.publish(this.prefixChannel(channels[i]), messageStringified);
       }
     }
+    
+    return Promise.resolve();
   }
 
   /**
@@ -313,7 +315,7 @@ export default class PubSubHook extends BaseHook {
    * @param eventName
    * @returns {string}
    */
-  prefixChannel = eventName => `${this.options.prefix}:${eventName}`;
+  prefixChannel = eventName => `${this.options.eventPrefix}:${eventName}`;
 
   /**
    * Removes the internal event name spacing prefix
@@ -321,6 +323,6 @@ export default class PubSubHook extends BaseHook {
    * @returns {string}
    */
   removeEventPrefix = eventName =>
-    eventName.slice(this.options.prefix.length + 1, eventName.length);
+    eventName.slice(this.options.eventPrefix.length + 1, eventName.length);
 
 }
