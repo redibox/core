@@ -21,6 +21,12 @@ export default function () {
       // [END IORedis Config]
     },
 
+    pubsub: {
+      subscriber: false,
+      publisher: false,
+      eventPrefix: 'rdb',
+    },
+
     log: {
       level: 'error',
       label: 'RediBox',

@@ -289,7 +289,7 @@ export default class PubSubHook extends BaseHook {
         this.clients.publisher.publish(this.prefixChannel(channels[i]), messageStringified);
       }
     }
-    
+
     return Promise.resolve();
   }
 

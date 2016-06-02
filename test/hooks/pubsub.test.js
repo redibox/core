@@ -23,7 +23,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnce and publish events from multiple channels', function testB(done) {
     this.timeout(3000);
-    const redibox = new RediBox({ pubsub: { subscriber: true } });
+    const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
       console.dir(error);
@@ -59,7 +59,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnce and timeout if option set', function testB(done) {
     this.timeout(500);
-    const redibox = new RediBox({ pubsub: { subscriber: true } });
+    const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
       console.dir(error);
@@ -83,7 +83,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnceOf and timeout if option set', function testB(done) {
     this.timeout(500);
-    const redibox = new RediBox({ pubsub: { subscriber: true } });
+    const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
       console.dir(error);
@@ -110,7 +110,7 @@ describe('core hooks - pubsub', () => {
     /* eslint no-var:0 */
     var listener;
     this.timeout(9000);
-    const redibox = new RediBox({ logRedisErrors: true, pubsub: { subscriber: true } });
+    const redibox = new RediBox({ logRedisErrors: true, pubsub: { subscriber: true, publisher: true} });
 
     const done10 = after(9, () => {
       redibox.pubsub.unsubscribe([
@@ -157,7 +157,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnce of multiple channels and unsub from all chans on the first event', function testB(done) {
     this.timeout(3000);
-    const redibox = new RediBox({ pubsub: { subscriber: true } });
+    const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
       console.dir(error);
