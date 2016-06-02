@@ -408,10 +408,10 @@ the default modules above, publish it and submit a PR to list it on the readme.
 ### Example Custom Hook
 
 ```javascript
-import { Hook } from 'redibox';
+import { BaseHook } from 'redibox';
 
-// just need to extend hook
-export default class CoolHook extends Hook {
+// just need to extend BaseHook
+export default class CoolHook extends BaseHook {
   constructor() {
     // super with the hook name
     // also used for the hooks key name
