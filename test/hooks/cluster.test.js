@@ -115,7 +115,6 @@ describe('core hooks - cluster', () => {
   // TODO - accessing an individual redis node breaks ioredis - wut o.O
   it('Should return an individual cluster node connection', function testB(done) {
     const redibox = new RediBox(clusterConfig, () => {
-      console.log('I BE HERE TO BE SURE')
       const node1 = redibox.cluster.getNodeClient('127.0.0.1:30001');
       // NEVER GETS HERE, just hangs or disconnects
       assert.equal(node1.options.port, 30001);

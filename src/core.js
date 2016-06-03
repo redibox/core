@@ -24,13 +24,15 @@
  *
  */
 
-import { hostname } from 'os';
 import cuid from 'cuid';
 import Redis from 'ioredis';
+import { hostname } from 'os';
 import Promise from 'bluebird';
-import EventEmitter from 'eventemitter3';
+import scripts from './scripts';
 import defaults from './defaults';
 import hookLoader from './utils/loader';
+import EventEmitter from 'eventemitter3';
+
 import {
   noop,
   mergeDeep,
@@ -62,7 +64,7 @@ export default class RediBox extends EventEmitter {
     this.id = cuid();
     this.hooks = {};
     this.clients = {};
-    this.scripts = {};
+    this.scripts = scripts;
     this._hooksCount = 0;
     this._clientCount = 0;
     this._allClientCount = 0;

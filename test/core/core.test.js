@@ -92,7 +92,7 @@ describe('core', () => {
     redibox.quit();
     done();
   });
-  
+
 
   it('Should be able to create custom clients using original config', done => {
     const redibox = new RediBox();
@@ -109,6 +109,17 @@ describe('core', () => {
     redibox.createClient('fooBobCustom', redibox).then(() => {
       assert.isDefined(redibox.clients.fooBobCustom);
       assert.isTrue(redibox.isClientConnected(redibox.clients.fooBobCustom));
+      redibox.quit();
+      done();
+    });
+  });
+
+  it('Should provide some default lua commands', done => {
+    const redibox = new RediBox((error, status) => {
+      assert.isDefined(redibox.client.lcap);
+      assert.isDefined(redibox.client.setnxex);
+      assert.isDefined(redibox.client.psetnxex);
+      assert.isNotNull(status);
       redibox.quit();
       done();
     });
