@@ -28,7 +28,7 @@ import { Logger, transports } from 'winston';
 import { createHash } from 'crypto';
 import { sep, join, resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
-import { encode, decode } from 'json-simple';
+import { decode } from 'json-simple';
 
 /**
  * Generates from sha1 sum from an object.
