@@ -251,7 +251,7 @@ export function tryJSONParse(string) {
  */
 export function tryJSONStringify(data) {
   try {
-    return encode(data);
+    return JSON.stringify(data);
   } catch (jsonError) {
     return undefined;
   }
