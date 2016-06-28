@@ -54,6 +54,23 @@ RediBox.on('error' error => {
 See the [default config](https://github.com/redibox/core/blob/master/src/defaults.js) for all available configuration options.
 
 
+## RediBox Hooks
+
+Redibox also has plenty of hook modules to support many of the common Redis use cases.
+
+ - [Cache](https://github.com/redibox/cache) - Advanced caching helpers
+ - [Job](https://github.com/redibox/job) - Distributed jobs
+ - [Schedule](https://github.com/redibox/schedule) - Distributed scheduling
+ - [Lock](https://github.com/redibox/lock) - Redlock locking mechanisms
+ - [IPC](https://github.com/redibox/ipc) - Interprocess communication
+ - [Throttle](https://github.com/redibox/throttle) - Throttling things, i.e. 100 inbound http reqs per user ever 10secs
+
+If you want to publish your own module and list it here just follow the general setup/structure of
+the default modules above, publish it and submit a PR to list it on the readme.
+
+*TODO: RediBox Module template / example repo.*
+
+
 ## Core
 
 #### - quit -
@@ -389,21 +406,6 @@ Publishes a message to single or multiple channels. Non string values automatica
   });
 ```
 
-## RediBox Hooks
-
-Redibox also has plenty of hook modules to support many of the common Redis use cases.
-
- - [Cache](https://github.com/redibox/cache)
- - [Job](https://github.com/redibox/job)
- - [Schedule](https://github.com/redibox/schedule)
- - [Lock](https://github.com/redibox/lock)
- - [IPC](https://github.com/redibox/ipc)
- - [Throttle](https://github.com/redibox/throttle)
-
-If you want to publish your own module and list it here just follow the general setup/structure of
-the default modules above, publish it and submit a PR to list it on the readme.
-
-*TODO: RediBox Module template / example repo.*
 
 ### Example Custom Hook
 
