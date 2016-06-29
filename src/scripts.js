@@ -83,4 +83,90 @@ export default {
         redis.call("LTRIM", k, 0, limit -1)
     `,
   },
+
+  /**
+   * Decrement a key by a value and reset the expire time
+   * Useful to auto expire the key after no activity for X time
+   */
+  decrByAndEx: {
+    keys: 1,
+    lua: `
+        --[[
+          key 1 -> key name
+          arg 1 -> expires in seconds
+          arg 2 -> incr by value
+        ]]
+        
+        redis.call('decrby', KEYS[1], tonumber(ARGV[2]))
+        redis.call('expires', KEYS[1], tonumber(ARGV[1]))
+    `,
+  },
+
+  /**
+   * Increment a key by a value and reset the expire time
+   * Useful to auto expire the key after no activity for X time
+   */
+  incrByAndEx: {
+    keys: 1,
+    lua: `
+        --[[
+          key 1 -> key name
+          arg 1 -> expires in seconds
+          arg 2 -> incr by value
+        ]]
+        
+        redis.call('incrby', KEYS[1], tonumber(ARGV[2]))
+        redis.call('expires', KEYS[1], tonumber(ARGV[1]))
+    `,
+  },
+
+  /**
+   * Same as above but only sets the expire once on first time creating key
+   */
+  incrByAndExOnce: {
+    keys: 1,
+    lua: `
+        --[[
+          key 1 -> key name
+          arg 1 -> expires in seconds
+          arg 2 -> incr by value
+        ]]
+        
+        -- Key exists so increment it
+        if redis.call('exists',KEYS[1]) > 0 then
+          redis.call('incrby',KEYS[1],tonumber(ARGV[2]))
+          return 0
+        else
+          -- key doesn't exist so create with an expiry and the incr amount
+          redis.call('setex',KEYS[1],tonumber(ARGV[1]),tonumber(ARGV[2]))
+          return 1
+        end
+
+    `,
+  },
+
+  /**
+   * Same as above but decrementing - if the key does not exist it's set with a starting value of 0
+   */
+  decrByAndExOnce: {
+    keys: 1,
+    lua: `
+        --[[
+          key 1 -> key name
+          arg 1 -> expires in seconds
+          arg 2 -> decr by value
+        ]]
+        
+        -- Key exists so increment it
+        if redis.call('exists',KEYS[1]) > 0 then
+          redis.call('decrby',KEYS[1],tonumber(ARGV[2]))
+          return 0
+        else
+          -- key doesn't exist so create with an expiry and set to 0
+          redis.call('setex',KEYS[1],tonumber(ARGV[1]),0)
+          return 1
+        end
+
+    `,
+  },
 };
