@@ -64,6 +64,7 @@ Redibox also has plenty of hook modules to support many of the common Redis use 
  - [Lock](https://github.com/redibox/lock) - Redlock locking mechanisms
  - [IPC](https://github.com/redibox/ipc) - Interprocess communication
  - [Throttle](https://github.com/redibox/throttle) - Throttling things, i.e. 100 inbound http reqs per user ever 10secs
+ - [Trend](https://github.com/redibox/trend) - Track temporal trends in non-stationary categorical distributions using a forget-table style data structure.
 
 If you want to publish your own module and list it here just follow the general setup/structure of
 the default modules above, publish it and submit a PR to list it on the readme.
