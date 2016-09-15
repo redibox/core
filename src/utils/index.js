@@ -28,7 +28,6 @@ import { Logger, transports } from 'winston';
 import { createHash } from 'crypto';
 import { sep, join, resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
-import { decode } from 'json-simple';
 
 /**
  * Generates from sha1 sum from an object.
@@ -238,7 +237,7 @@ export function arrayChunks(array, chunkSize) {
  */
 export function tryJSONParse(string) {
   try {
-    return decode(string);
+    return JSON.parse(string);
   } catch (jsonError) {
     return string;
   }
