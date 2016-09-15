@@ -64,12 +64,10 @@ class BaseHook extends EventEmitter {
   /**
    * Wrapper to create a client, clients created are located at Hook.clients.clientName
    * @param clientName
-   * @param readOnly
-   * @param readyCallback
    * @returns {*}
    */
-  createClient(clientName, readOnly, readyCallback) {
-    return this.core.createClient(clientName, readOnly, readyCallback, this);
+  createClient(clientName) {
+    return this.core.createClient(clientName, this);
   }
 
   /**
