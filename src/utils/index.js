@@ -24,9 +24,9 @@
  *
  */
 
-import { Logger, transports } from 'winston';
 import { createHash } from 'crypto';
 import { sep, join, resolve } from 'path';
+import { Logger, transports } from 'winston';
 import { existsSync, readFileSync } from 'fs';
 
 /**
