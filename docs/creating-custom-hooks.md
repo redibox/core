@@ -19,12 +19,11 @@ On init your hook has all the following methods and properties attached to it:
 
 By default you're provided with `this.client` as a client - this is the core's redis connection instance, you shouldn't need any additional connections unless you're running blocking commands.
 
-To create new redis connections for this hook then simply call the built-in hook method `createClient(<String> name)` this returns a promise which on resolving will attached your new redis connection onto the `clients` object of your hook. It's normally best to do this in the init of your hook - as shown in the example hook.
+To create new Redis connections for this hook then simply call the built-in hook method `createClient(<String> name)` this returns a promise which on resolving will attach your new Redis connection onto the `clients` object of your hook. It's normally best to do this in the init of your hook - as shown in the example hook.
 
 ### Adding new LUA scripts
 
-Before initializing your hook the hook loader first calls the `.scripts()` method of your hook, any scripts returned from this are automatically loaded and cached, **ALL** redis connections get these scripts added, including clients created with `.createClient()`.
-
+Before initializing your hook, the hook loader first calls the `.scripts()` method of your hook, any scripts returned from this are automatically loaded and cached, **ALL** Redis connections get these scripts added, including clients created with `.createClient()`.
 
 Object keys of the returned object in this function are used a script names, each script must contain the properties below:
 
