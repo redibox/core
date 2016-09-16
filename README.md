@@ -58,7 +58,9 @@ See the [default config](https://github.com/redibox/core/blob/master/src/default
 - [Core API](/docs/core-api.md)
 - [Cluster Hook](/docs/cluster-hook.md)
 - [Pubsub Hook](/docs/pubsub-hook.md)
-- [Extending functionality via Hooks](/docs/creating-custom-hooks.md)
+- [Extending via Hooks](/docs/creating-custom-hooks.md)
+- [Experimental Redis Client](/docs/experimental-client.md)
+
 
 ## Hooks
 
