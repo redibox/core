@@ -7,7 +7,7 @@
 [![build](https://travis-ci.org/redibox/core.svg)](https://travis-ci.org/redibox/core)
 [![License](https://img.shields.io/npm/l/redibox.svg)](/LICENSE)
 
-Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis) ([for now](/docs/experimental-client)).
+Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis) ([for now](/docs/experimental-client.md)).
 
 ## What can you do with RediBox?
 
