@@ -7,7 +7,7 @@
 [![build](https://travis-ci.org/redibox/core.svg)](https://travis-ci.org/redibox/core)
 [![License](https://img.shields.io/npm/l/redibox.svg)](/LICENSE)
 
-Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis).
+Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis) ([for now](/docs/experimental-client.md)).
 
 ## What can you do with RediBox?
 
@@ -58,7 +58,9 @@ See the [default config](https://github.com/redibox/core/blob/master/src/default
 - [Core API](/docs/core-api.md)
 - [Cluster Hook](/docs/cluster-hook.md)
 - [Pubsub Hook](/docs/pubsub-hook.md)
-- [Extending functionality via Hooks](/docs/creating-custom-hooks.md)
+- [Extending via Hooks](/docs/creating-custom-hooks.md)
+- [Experimental Redis Client](/docs/experimental-client.md)
+
 
 ## Hooks
 
