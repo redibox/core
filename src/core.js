@@ -69,7 +69,6 @@ export default class RediBox extends EventEmitter {
     this._clientCount = 0;
     this._allClientCount = 0;
     this.bootedAtTimestamp = Date.now();
-    this.on('ready', ::this.notifyHooks);
     this.log = createLogger(this.options.log);
     this.options = mergeDeep(defaults(), options);
     this.options.redis.cluster = !!this.options.redis.hosts && this.options.redis.hosts.length > 0;
@@ -92,6 +91,7 @@ export default class RediBox extends EventEmitter {
         .then(() => {
           this.trumpWall();
           this.emit('ready');
+          this.notifyHooks();
           callback();
         }, this.handleError).catch(this.handleError);
     });
