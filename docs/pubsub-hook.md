@@ -1,6 +1,6 @@
 ## PubSub
 
-RediBox core PUBSUB is more than just the standard a standard redis clients single 'message' event handler. It's setup to allow subscribing just like you would with a node event emitter.
+RediBox core PUBSUB is more than just the standard redis clients single 'message' event handler. It's setup to allow subscribing just like you would with a node event emitter.
 
 Internally though, RediBox has a on 'message' handler that routes pubsub messages to an event emitter which you're listening to when you subscribe, this gives you better control over channel flow.
 
@@ -15,7 +15,6 @@ This accepts a single channel as a string or multiple channels as an Array.
 **Parameters:**
  - **channels**: `String || Array` , A string or array of strings of channels to subscribe to.
  - **listener**: `Function` , Your event listener.
- - **subscribedCallback**: `Function` , callback to be called once subscribed, first param is an error.
  - **timeout**: `Number` , **Optional** timeout ms - timeout after specified length of time, listener is called with a timeout event (`event.timeout`).
 
 **Example:**
@@ -32,18 +31,16 @@ This accepts a single channel as a string or multiple channels as an Array.
     console.dir(message.channel); // channel name
     console.dir(message.timestamp); // when the message was received
     console.dir(message.data); // JSON parsed data
-  }, function (err) { // on subscribed callback
-    if (!err) {
-      console.log('Subscribed once to multiple channels!');
+  } , 3000).then(() => { // on subscribed callback
+    console.log('Subscribed once to multiple channels!');
 
-      // test publish to just one channel, the rest will timeout
-      // this is normally sent from somewhere else
-      RediBox.publish('requestID-123456:request:dataPart1', {
-        someArray: [1, 2, 3, 4, 5],
-        somethingElse: 'foobar'
-      });
-    }
-  }, 3000); // I want an event back within 3 seconds for each channel ( so each has 3 secs to respond )
+    // test publish to just one channel, the rest will timeout
+    // this is normally sent from somewhere else
+    RediBox.publish('requestID-123456:request:dataPart1', {
+      someArray: [1, 2, 3, 4, 5],
+      somethingElse: 'foobar'
+    });
+  });
 
   /**
   CONSOLE OUTPUT:
