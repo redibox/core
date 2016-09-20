@@ -1,7 +1,7 @@
 {
   "name": "redibox",
   "description": "Redis connection and PUBSUB subscription manager for node. Built for performance, powered by ioredis.",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "main": "lib/index.js",
   "author": "Mike Diarmid",
   "repository": "redibox/core",
