@@ -194,4 +194,4 @@ export function importConfigHooks(core) {
 export default core => Promise.all([
   importConfigHooks(core),
   importPackageHooks(core),
-]).then(() => Promise.all(Object.keys(core.hooks).map(key => core.hooks[key].ready())));
+]);

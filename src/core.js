@@ -69,9 +69,10 @@ export default class RediBox extends EventEmitter {
     this._clientCount = 0;
     this._allClientCount = 0;
     this.bootedAtTimestamp = Date.now();
+    this.on('ready', ::this.notifyHooks);
+    this.log = createLogger(this.options.log);
     this.options = mergeDeep(defaults(), options);
     this.options.redis.cluster = !!this.options.redis.hosts && this.options.redis.hosts.length > 0;
-    this.log = createLogger(this.options.log);
 
     // setup connection timeout
     const connectionFailedTimer = setTimeout(() => {
@@ -110,6 +111,23 @@ export default class RediBox extends EventEmitter {
     this.log.silly(`  - ${this._hooksCount} hooks.`);
     this.log.silly(`  - ${this._allClientCount} clients.`);
     this.log.silly('-----------------------\n');
+  }
+
+  /**
+   * Send an event to all hooks
+   * @param event
+   * @param data
+   */
+  notifyHooks(event = 'core:ready', data = {}) {
+    process.nextTick(() => {
+      const hooks = Object.keys(this.hooks);
+      for (let i = 0; i < hooks.length; i++) {
+        const hookKey = hooks[i];
+        if (this.hooks[hookKey].emit) {
+          this.hooks[hookKey].emit(event, data);
+        }
+      }
+    });
   }
 
   /**
