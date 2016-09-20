@@ -24,6 +24,15 @@ class BaseHook extends EventEmitter {
   }
 
   /**
+   * Just a stub, meant to be overridden in custom hook
+   * this is called when everything has been bootstrapped and is ready.
+   * @returns {Promise.<T>}
+   */
+  ready() {
+    return Promise.resolve();
+  }
+
+  /**
    * Stub function to return config defaults for the hook
    * @returns {{}}
    */
