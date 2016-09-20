@@ -69,8 +69,8 @@ export default class RediBox extends EventEmitter {
     this._clientCount = 0;
     this._allClientCount = 0;
     this.bootedAtTimestamp = Date.now();
-    this.log = createLogger(this.options.log);
     this.options = mergeDeep(defaults(), options);
+    this.log = createLogger(this.options.log);
     this.options.redis.cluster = !!this.options.redis.hosts && this.options.redis.hosts.length > 0;
 
     // setup connection timeout
