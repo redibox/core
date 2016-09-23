@@ -26,12 +26,13 @@
 
 import cuid from 'cuid';
 import Redis from 'ioredis';
+import EventEmitter from 'eventemitter3';
+
 import { hostname } from 'os';
 import Promise from 'bluebird';
 import scripts from './scripts';
 import defaults from './defaults';
 import hookLoader from './utils/loader';
-import EventEmitter from 'eventemitter3';
 
 import {
   noop,
@@ -144,7 +145,7 @@ export default class RediBox extends EventEmitter {
       }
       return this.emit('error', error);
     }
-    return void 0;
+    return undefined;
   };
 
   /**
@@ -263,18 +264,18 @@ export default class RediBox extends EventEmitter {
     const command = name.toLowerCase();
 
     // read/write instance
-    if (!this.clients.default.hasOwnProperty(command)) {
+    if (!this.clients.default[command]) {
       this.clients.default.defineCommand(command, { numberOfKeys, lua });
-      if (!this.hasOwnProperty(command)) {
+      if (!this[command]) {
         this[command] = this._customCommandWrapper(command, readOnly);
       }
-      clientsWithCommand = clientsWithCommand + 1;
+      clientsWithCommand += 1;
     }
 
     // read only instance, if available and if the script is set as a ready only script
-    if (this.clients.readOnly && !this.clients.readOnly.hasOwnProperty(command) && readOnly) {
+    if (this.clients.readOnly && !this.clients.readOnly[command] && readOnly) {
       this.clients.readOnly.defineCommand(command, { numberOfKeys, lua });
-      clientsWithCommand = clientsWithCommand + 1;
+      clientsWithCommand += 1;
     }
 
     // return true/false if all possible clients got the command defined.
@@ -292,20 +293,20 @@ export default class RediBox extends EventEmitter {
       const script = customScripts[key];
       const keyLower = key.toLowerCase();
       // quick validations
-      if (!script.hasOwnProperty('keys')) {
+      if (!Object.hasOwnProperty.call(script, 'keys')) {
         return this.log.warn(
           `Script '${keyLower}' is missing required property 'key'! ...SKIPPED!`
         );
       }
 
-      if (!script.hasOwnProperty('lua')) {
+      if (!Object.hasOwnProperty.call(script, 'lua')) {
         return this.log.warn(
           `Script '${keyLower}' from is missing required property 'lua'! ...SKIPPED!`
         );
       }
 
       // default instance
-      if (!client.hasOwnProperty(keyLower)) {
+      if (!Object.hasOwnProperty.call(client, keyLower)) {
         this.log.debug(`Defining command for lua script '${keyLower}'.`);
         client.defineCommand(keyLower, {
           numberOfKeys: script.keys,
@@ -313,7 +314,7 @@ export default class RediBox extends EventEmitter {
         });
       }
 
-      return void 0;
+      return undefined;
     });
   }
 

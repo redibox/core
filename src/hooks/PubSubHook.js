@@ -1,5 +1,5 @@
-import BaseHook from './BaseHook';
 import EventEmitter from 'eventemitter3';
+import BaseHook from './BaseHook';
 
 import {
   once,

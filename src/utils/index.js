@@ -86,8 +86,8 @@ export function throttle(func, limit) {
  */
 export function deepGet(obj, path) {
   let tmpObj = obj;
-  path.split('.').forEach(key => {
-    if (!tmpObj || !hasOwnProperty.call(tmpObj, key)) {
+  path.split('.').forEach((key) => {
+    if (!tmpObj || !Object.hasOwnProperty.call(tmpObj, key)) {
       tmpObj = null;
       return;
     }
@@ -105,9 +105,9 @@ export function deepGet(obj, path) {
 export function after(n, done) {
   let times = n;
   return () => {
-    times = times - 1;
+    times -= 1;
     if (times === 0) return typeof done === 'function' && done();
-    return void 0;
+    return undefined;
   };
 }
 
@@ -151,18 +151,18 @@ export function noop() {
 export function nodify(promise, callback) {
   if (callback) {
     // prevent any callback exceptions getting swallowed by the Promise handlers
-    const queueThrow = e => {
+    const queueThrow = (e) => {
       setTimeout(() => {
         throw e;
       }, 0);
     };
-    promise.then(v => {
+    promise.then((v) => {
       try {
         callback(null, v);
       } catch (e) {
         queueThrow(e);
       }
-    }).catch(r => {
+    }).catch((r) => {
       try {
         callback(r);
       } catch (e) {
@@ -200,6 +200,7 @@ export function isObject(item) {
  * @returns {number}
  */
 export function randomInt() {
+  /* eslint no-bitwise:0 */
   return Math.floor(Math.random() * 0x100000000 | 0).toString(16);
 }
 
@@ -210,14 +211,15 @@ export function randomInt() {
  */
 export function mergeDeep(target, source) {
   if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach(key => {
+    /* eslint no-restricted-syntax: 0 */
+    for (const key in source) {
       if (isObject(source[key])) {
         if (!target[key]) Object.assign(target, { [key]: {} });
         mergeDeep(target[key], source[key]);
       } else {
         Object.assign(target, { [key]: source[key] });
       }
-    });
+    }
   }
   return target;
 }

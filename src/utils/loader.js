@@ -1,4 +1,5 @@
 import { loadPackageJSON, mergeDeep } from './../utils';
+
 const hookPrefix = 'redibox-hook';
 const hookRegexReplace = new RegExp(`@?[a-zA-Z-_0-9.]*?\/?${hookPrefix}-`);
 
@@ -90,7 +91,7 @@ function loadHook(UserHook, keyName, core) {
     core.log.debug(`Hook '${keyName}': initialising`);
     const hookInitPromise = userHook.initialize(initReturn);
 
-    if (!hookInitPromise) return void 0;
+    if (!hookInitPromise) return undefined;
 
     // init hook
     return hookInitPromise

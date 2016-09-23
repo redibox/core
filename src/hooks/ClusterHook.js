@@ -46,7 +46,7 @@ export default class ClusterHook extends BaseHook {
       return Promise.reject(new Error('Cannot exec: No master nodes found!'));
     }
 
-    return Promise.all(nodes.map(node => node[command.toLowerCase()].apply(node, args)));
+    return Promise.all(nodes.map(node => node[command.toLowerCase()](...args)));
   }
 
   /**
@@ -91,7 +91,7 @@ export default class ClusterHook extends BaseHook {
    */
   getNodeClient(address) {
     if (!this.isCluster()) {
-      return void 0;
+      return undefined;
     }
     return this.client.connectionPool.nodes.all[address];
   }
