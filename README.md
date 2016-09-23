@@ -49,6 +49,8 @@ RediBox.on('error' error => {
 });
 ```
 
+For an example of connecting to a cluster see the [Cluster Hook](/docs/cluster-hook.md) documentation.
+
 ## Configuration
 
 See the [default config](https://github.com/redibox/core/blob/master/src/defaults.js) for all available configuration options.
