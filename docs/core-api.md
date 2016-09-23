@@ -17,6 +17,13 @@ RediBox.disconnect();
 
 Returns `true` if connected or `false` if not.
 
+```javascript
+const isConnected = RediBox.isClientConnected();
+```
 #### **hostInfo**
 
 Returns an object of details about this host, it's process and timestamps. Used for pubsub.
+
+```javascript
+console.log(RediBox.hostInfo());
+```
