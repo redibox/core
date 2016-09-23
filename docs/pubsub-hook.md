@@ -118,7 +118,7 @@ Equivalent to node's EventEmitter.on() with an optional **subscribedCallback** t
     console.dir(message.channel); // channel name
     console.dir(message.timestamp); // when the message wa received
     console.dir(message.data); // JSON parsed data
-  }.then(() => {
+  }).then(() => {
     // test publish to this channel
     // this is normally sent from somewhere else
     RediBox.publish('getMeSomeDataMrWorkerServer', {
@@ -137,7 +137,6 @@ Equivalent to node's EventEmitter.on() with an optional **subscribedCallback** t
 
   */
 ```
-
 
 
 #### - unsubscribe -
