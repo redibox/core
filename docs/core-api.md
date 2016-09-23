@@ -18,7 +18,7 @@ RediBox.disconnect();
 Returns `true` if connected or `false` if not.
 
 ```javascript
-const isConnected = RediBox.isClientConnected();
+const isConnected = RediBox.isClientConnected(RediBox.clients.myCustomClient);
 ```
 #### **hostInfo**
 
