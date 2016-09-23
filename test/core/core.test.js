@@ -47,7 +47,6 @@ describe('core', () => {
     });
 
     assert.isDefined(redibox.handleError);
-    assert.isFalse(redibox.options.log.logRedisErrors);
     assert.isDefined(redibox.emit);
     assert.isUndefined(redibox.handleError());
     redibox.handleError('failFish');
