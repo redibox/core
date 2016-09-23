@@ -1,9 +1,54 @@
-## Cluster Utils
+## Cluster Hook
 
-## Cluster
+#### Proxy commands to all cluster nodes
+
+All redis commands can be called against `RediBox.cluster...` for example `RediBox.cluster.flushall()`. Commands you run like this are sent to all `master` nodes.
+
+**Example**:
+
+```javascript
+import Redibox from 'redibox';
+
+const RediBox = new Redibox({
+  redis: {
+    hosts: [
+      // MASTERS
+      { host: '127.0.0.1', port: 30001 },
+      { host: '127.0.0.1', port: 30002 },
+      { host: '127.0.0.1', port: 30003 },
+      // SLAVES
+      { host: '127.0.0.1', port: 30004 },
+      { host: '127.0.0.1', port: 30005 },
+      { host: '127.0.0.1', port: 30006 },
+    ],
+  },
+});
+
+RediBox.on('ready' () => {
+  console.log('I AM READY');
+  // flush all on masters
+  RediBox.cluster.flushall().then(result => {
+    console.dir(result);
+  });
+});
+
+// CONSOLE OUTPUT:
+/*
+  I AM READY
+  [
+    'OK',
+    'OK',
+    'OK'
+  ]
+*/
+```
+
+
+### Utils
+---
 
 #### - exec -
-Send a command to all cluster master nodes.
+Send a command to all cluster master nodes. This is what the proxy above uses internally.
 
 **Parameters:**
  - **command**: `String` , the the command e.g. `FLUSHALL`.
@@ -21,14 +66,14 @@ Send a command to all cluster master nodes.
 ```
 
 
-#### - clusterGetNodes -
+#### - getNodes -
 Returns an array of all master and slave node addresses that we are connected to.
 
 **Returns**: `Array<String>`
 
 **Example**:
 ```javascript
-  console.dir(RediBox.clusterGetNodes());
+  console.dir(RediBox.cluster.getNodes());
 
   // logs:
   /*
@@ -43,14 +88,14 @@ Returns an array of all master and slave node addresses that we are connected to
   */
 ```
 
-#### - clusterGetSlaves -
+#### - getSlaves -
 Returns an array of all the slave node addresses.
 
 **Returns**: `Array<String>`
 
 **Example**:
 ```javascript
-  console.dir(RediBox.clusterGetSlaves());
+  console.dir(RediBox.cluster.getSlaves());
 
   // logs:
   /*
@@ -62,14 +107,14 @@ Returns an array of all the slave node addresses.
   */
 ```
 
-#### - clusterGetMasters -
+#### - getMasters -
 Returns an array of all the master node addresses.
 
 **Returns**: `Array<String>`
 
 **Example**:
 ```javascript
-  console.dir(RediBox.clusterGetMasters());
+  console.dir(RediBox.cluster.getMasters());
 
   // logs:
   /*
@@ -81,7 +126,7 @@ Returns an array of all the master node addresses.
   */
 ```
 
-#### - clusterGetNodeClient -
+#### - cletNodeClient -
 Returns the individual cluster node connection instance.
 Returns 'false' if not found.
 
@@ -89,7 +134,7 @@ Returns 'false' if not found.
 
 **Example**:
 ```javascript
-  const slave4Client = RediBox.clusterGetNodeClient('127.0.0.1:30004');
+  const slave4Client = RediBox.cluster.getNodeClient('127.0.0.1:30004');
 
   if (slave4Client) {
     // do something with the client
