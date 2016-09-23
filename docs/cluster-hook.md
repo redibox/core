@@ -126,7 +126,7 @@ Returns an array of all the master node addresses.
   */
 ```
 
-#### - cletNodeClient -
+#### - getNodeClient -
 Returns the individual cluster node connection instance.
 Returns 'false' if not found.
 
@@ -141,3 +141,10 @@ Returns 'false' if not found.
     slave4Client.hgetall(...args);
   }
 ```
+
+
+#### - isCluster -
+Returns true or false if this instances of core is a cluster connection.
+
+**Returns**: `true || false`
+
