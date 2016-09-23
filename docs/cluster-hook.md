@@ -47,16 +47,14 @@ RediBox.on('ready' () => {
 ### Utils
 ---
 
-#### - exec -
-Send a command to all cluster master nodes. This is what the proxy above uses internally.
-
-**Parameters:**
+#### **exec**
  - **command**: `String` , the the command e.g. `FLUSHALL`.
  - **...args**: `Params` , args to send with command.
 
-**Returns**: `Promise`
+Send a command to all cluster master nodes. This is what the proxy above uses internally.
 
-**Example**:
+Returns a `Promise.all`.
+
 ```javascript
   RediBox.exec('flushall').then(function (result) {
     console.dir(result);
@@ -66,12 +64,11 @@ Send a command to all cluster master nodes. This is what the proxy above uses in
 ```
 
 
-#### - getNodes -
+#### **getNodes**
 Returns an array of all master and slave node addresses that we are connected to.
 
-**Returns**: `Array<String>`
+Returns `Array<String>`
 
-**Example**:
 ```javascript
   console.dir(RediBox.cluster.getNodes());
 
@@ -88,12 +85,11 @@ Returns an array of all master and slave node addresses that we are connected to
   */
 ```
 
-#### - getSlaves -
+#### **getSlaves**
 Returns an array of all the slave node addresses.
 
-**Returns**: `Array<String>`
+Returns `Array<String>`
 
-**Example**:
 ```javascript
   console.dir(RediBox.cluster.getSlaves());
 
@@ -107,12 +103,11 @@ Returns an array of all the slave node addresses.
   */
 ```
 
-#### - getMasters -
+#### **getMasters**
 Returns an array of all the master node addresses.
 
-**Returns**: `Array<String>`
+Returns `Array<String>`
 
-**Example**:
 ```javascript
   console.dir(RediBox.cluster.getMasters());
 
@@ -126,13 +121,12 @@ Returns an array of all the master node addresses.
   */
 ```
 
-#### - getNodeClient -
+#### **getNodeClient**
 Returns the individual cluster node connection instance.
 Returns 'false' if not found.
 
-**Returns**: `RedisClient || false`
+Returns `RedisClient || false`
 
-**Example**:
 ```javascript
   const slave4Client = RediBox.cluster.getNodeClient('127.0.0.1:30004');
 
@@ -143,8 +137,11 @@ Returns 'false' if not found.
 ```
 
 
-#### - isCluster -
+#### **isCluster**
 Returns true or false if this instances of core is a cluster connection.
 
-**Returns**: `true || false`
+Returns `true` or `false`.
 
+```javascript
+  const isCluster = RediBox.cluster.isCluster();
+```

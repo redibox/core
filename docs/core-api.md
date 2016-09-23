@@ -1,15 +1,29 @@
 ## Core API
 
-#### - quit -
+#### **quit**
 Disconnects all redis clients but first waits for pending replies.
 
-#### - disconnect -
+```javascript
+RediBox.quit();
+```
+#### **disconnect**
 Force Disconnects, will not wait for pending replies (use disconnect if you need to wait).
 
-#### - isClientConnected -
-Returns the connection state of the redis client provided.
+```javascript
+RediBox.disconnect();
+```
+#### **isClientConnected**
+  - **client** [Object] `RedisClient` , the redis client instance to check.
 
-**Parameters:**
- - **client**: `RedisClient` , the redis client instance to check.
+Returns `true` if connected or `false` if not.
 
-**Returns**: `Boolean` , true if connected.
+```javascript
+const isConnected = RediBox.isClientConnected(RediBox.clients.myCustomClient);
+```
+#### **hostInfo**
+
+Returns an object of details about this host, it's process and timestamps. Used for pubsub.
+
+```javascript
+console.log(RediBox.hostInfo());
+```
