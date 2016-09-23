@@ -16,6 +16,7 @@ This accepts a single channel as a string or multiple channels as an Array.
  - **channels**: `String || Array` , A string or array of strings of channels to subscribe to.
  - **listener**: `Function` , Your event listener.
  - **timeout**: `Number` , **Optional** timeout ms - timeout after specified length of time, listener is called with a timeout event (`event.timeout`).
+ - **RETURNS**: `Promise`
 
 **Example:**
 ```javascript
@@ -31,7 +32,7 @@ This accepts a single channel as a string or multiple channels as an Array.
     console.dir(message.channel); // channel name
     console.dir(message.timestamp); // when the message was received
     console.dir(message.data); // JSON parsed data
-  } , 3000).then(() => { // on subscribed callback
+  } , 3000).then(() => {
     console.log('Subscribed once to multiple channels!');
 
     // test publish to just one channel, the rest will timeout
@@ -64,8 +65,8 @@ This accepts a single channel as a string or multiple channels as an Array.
 **Parameters:**
  - **channels**: `String || Array` , A string or array of strings of channels to subscribe to.
  - **listener**: `Function` , Your event listener.
- - **subscribedCallback**: `Function` , callback to be called once subscribed, first param is an error.
  - **timeout**: `Number` , **Optional** timeout ms - timeout after specified length of time, listener is called with a timeout event (`event.timeout`).
+ - **RETURNS**: `Promise`
 
 **Example:**
 ```javascript
@@ -81,17 +82,15 @@ This accepts a single channel as a string or multiple channels as an Array.
     console.dir(message.channel); // channel name
     console.dir(message.timestamp); // when the message was received
     console.dir(message.data); // JSON parsed data
-  }, function (err) { // on subscribed callback
-    if (!err) {
-      console.log('Subscribed once of multiple channels!');
+  }, 3000).then(() => {
 
-      // test publish to just one channel, the rest will unsub after receiving this
-      RediBox.publish('requestID-123456:request:success', {
-        someArray: [1, 2, 3, 4, 5],
-        somethingElse: 'foobar'
-      });
-    }
-  }, 3000); // I want an event back within 3 seconds for any channel before they all timeout
+    // test publish to just one channel, the rest will unsub after receiving this
+    RediBox.publish('requestID-123456:request:success', {
+      someArray: [1, 2, 3, 4, 5],
+      somethingElse: 'foobar'
+    });
+
+  }); // I want an event back within 3 seconds for any channel before they all timeout
 
   /**
   CONSOLE OUTPUT:
@@ -105,12 +104,12 @@ This accepts a single channel as a string or multiple channels as an Array.
 ```
 
 #### - subscribe -
-Equivalent to node's EventEmiiter.on() with an optional **subscribedCallback** to let you know when subscribed. This accepts a single channel as a string or multiple channels as an Array.
+Equivalent to node's EventEmitter.on() with an optional **subscribedCallback** to let you know when subscribed. This accepts a single channel as a string or multiple channels as an Array.
 
 **Parameters:**
  - **channels**: `String || Array` , A string or array of strings of channels to subscribe to.
  - **listener**: `Function` , Your event listener.
- - **subscribedCallback**: `Function` , callback to be called once subscribed, first param is an error.
+ - **RETURNS**: `Promise`
 
 **Example:**
 ```javascript
@@ -119,15 +118,13 @@ Equivalent to node's EventEmiiter.on() with an optional **subscribedCallback** t
     console.dir(message.channel); // channel name
     console.dir(message.timestamp); // when the message wa received
     console.dir(message.data); // JSON parsed data
-  }, function (err) { // subscribed callback
-    if (!err) {
-      // test publish to this channel
-      // this is normally sent from somewhere else
-      RediBox.publish('getMeSomeDataMrWorkerServer', {
-        someData: [1, 2, 3, 4, 5],
-        worker: 'serverXYZ'
-      });
-    }
+  }.then(() => {
+    // test publish to this channel
+    // this is normally sent from somewhere else
+    RediBox.publish('getMeSomeDataMrWorkerServer', {
+      someData: [1, 2, 3, 4, 5],
+      worker: 'serverXYZ'
+    });
   });
 
   /**
@@ -149,7 +146,7 @@ Unsubscribe from single or multiple channels. Note that even though listener is 
 **Parameters:**
  - **channels**: `String || Array` , A string or array of strings of channels to unsubscribe from.
  - **listener**: `Function` , **Optional** event listener.
- - **unsubscribedCallback**: `Function` , **Optional** callback to be called once unsubscribed, first param is an error.
+ - **RETURNS**: `Promise` - But can just be used without the promise - fire and forget
 
 **Example:**
 ```javascript
@@ -158,15 +155,13 @@ Unsubscribe from single or multiple channels. Note that even though listener is 
     console.log(message.data); // HELLO but not GOODBYE gets logged
   };
 
-  RediBox.subscribe('getMeSomeDataMrWorkerServer', myListener, function (err) {
-    if (!err) {
-      RediBox.publish('getMeSomeDataMrWorkerServer', 'HELLO');
-      // some time later on:
-      setTimeout(function () {
-        RediBox.unsubscribe('getMeSomeDataMrWorkerServer', myListener);
-        RediBox.publish('getMeSomeDataMrWorkerServer', 'GOODBYE');
-      }, 2000);
-    }
+  RediBox.subscribe('getMeSomeDataMrWorkerServer', myListener).then(() => {
+    RediBox.publish('getMeSomeDataMrWorkerServer', 'HELLO');
+    // some time later on:
+    setTimeout(function () {
+      RediBox.unsubscribe('getMeSomeDataMrWorkerServer', myListener);
+      RediBox.publish('getMeSomeDataMrWorkerServer', 'GOODBYE');
+    }, 2000);
   });
 
   /**
@@ -182,14 +177,14 @@ Publishes a message to single or multiple channels. Non string values automatica
 **Parameters:**
  - **channels**: `String || Array` , A string or array of strings of channels to publish to.
  - **message**: `String || Object` , **Optional** event listener.
- - **publishedCallback**: `Function` , **Optional** callback to be called once published, first param is an error.
+ - **RETURNS**: `Promise` - But can just be used without the promise - fire and forget
 
 **Example:**
 ```javascript
   RediBox.publish('someChannel', 'HELLO');
 
   // or with objects:
-  RediBox.publish('someChannel', {
+  RediBox.publish(['someChannel', 'someOtherChannel'], {
     foo: 'bar'
   });
 ```
