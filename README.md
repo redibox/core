@@ -75,6 +75,7 @@ RediBox has a built in hook loading system and has plenty of published hook modu
  - [Schedule](https://github.com/redibox/schedule) - Cross server task scheduling made easy.
  - [Throttle](https://github.com/redibox/throttle) - Provides lua scripts to throttle things, i.e. 100 inbound http reqs per user every 10secs
  - [Trend](https://github.com/redibox/trend) - Track trending data with Node - using Bitly Forget-Table type data structures.
+ - [API](https://github.com/redibox/api) - A JSON API for RediBox. (Work in progress).
 
 #### Public User Hooks
 
