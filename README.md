@@ -26,6 +26,8 @@ Install via npm:
 npm install redibox --save
 ```
 
+> If you're looking to integrate this with [SailsJS](http://sailsjs.org), we've got a [hook](https://github.com/redibox/sails-hook-redibox) for that.
+
 And include in your project:
 
 ```javascript
