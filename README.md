@@ -16,7 +16,7 @@ provides easy utilities around redis client connection monitoring, scaling clust
 reads with [`READONLY`](http://redis.io/commands/readonly), advanced subscriptions via PUBSUB (in the
 easy to use node.js Event Emitter format), lua script management and executing commands against a cluster.
 
-RediBox is also easily extensible via [Hooks](#example-custom-hook).
+RediBox is also easily extensible via [Hooks](https://github.com/redibox/core#hooks).
 
 ## Getting Started
 
