@@ -72,12 +72,6 @@ See the [default config](https://github.com/redibox/core/blob/master/src/default
 - [Extending via Hooks](/docs/creating-custom-hooks.md)
 - [Experimental Redis Client](/docs/experimental-client.md)
 
-#### Public User Hooks
-
-- None
-
-If you would like to publish your own hook and list it here see the [extending functionality via Hooks](/docs/creating-custom-hooks.md) documentation, once published submit a PR to list it on the readme here.
-
 ## Contributing
 
 Full contributing guidelines are to be written, however please ensure you follow these points when sending in PRs:
