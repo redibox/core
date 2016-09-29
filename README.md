@@ -7,16 +7,23 @@
 [![build](https://travis-ci.org/redibox/core.svg)](https://travis-ci.org/redibox/core)
 [![License](https://img.shields.io/npm/l/redibox.svg)](/LICENSE)
 
-Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis) ([for now](/docs/experimental-client.md)).
+Redis connection and PUBSUB subscription manager for node. Built for performance, powered by [ioredis](https://github.com/luin/ioredis) ([for now](/docs/experimental-client.md)). Maintained by [TeamFA](https://github.com/teamfa).
 
-## What can you do with RediBox?
+## What is it?
 
-RediBox offers out of the box support for clusters, sentinels and standalone redis servers. It also
-provides easy utilities around redis client connection monitoring, scaling cluster
-reads with [`READONLY`](http://redis.io/commands/readonly), advanced subscriptions via PUBSUB (in the
-easy to use node.js Event Emitter format), lua script management and executing commands against a cluster.
+RediBox is a NodeJS library which interacts with Redis to provide solutions to common use-cases in your application. It features out of the box support for clusters, sentinels or standalone redis servers. RediBox core provides utilities for managing your Redis client including client connection monitoring, advanced subscriptions via PUBSUB, lua script management and more.
 
-RediBox is also easily extensible via [Hooks](https://github.com/redibox/core#hooks).
+### Features
+
+The additional features RediBox offers are provided as [extensible hooks](/docs/creating-custom-hooks.md) which can be used on a per project level:
+
+ - [Cache](https://github.com/redibox/cache) - Redis as a cache layer made simple.
+ - [Job](https://github.com/redibox/job) - High performance, robust and flexible queue/worker system powered by redis.
+ - [Memset](https://github.com/redibox/memset) - Synchronised data sets stored in memory across all servers - for quick synchronous access to data that is commonly used but not likely to update frequently.
+ - [Schedule](https://github.com/redibox/schedule) - Cross server task scheduling made easy.
+ - [Throttle](https://github.com/redibox/throttle) - Provides lua scripts to throttle things, i.e. 100 inbound http reqs per user every 10secs
+ - [Trend](https://github.com/redibox/trend) - Track trending data with Node - using Bitly Forget-Table type data structures.
+ - [API](https://github.com/redibox/api) - A JSON API for RediBox. (Work in progress).
 
 ## Getting Started
 
@@ -64,20 +71,6 @@ See the [default config](https://github.com/redibox/core/blob/master/src/default
 - [Pubsub Hook](/docs/pubsub-hook.md)
 - [Extending via Hooks](/docs/creating-custom-hooks.md)
 - [Experimental Redis Client](/docs/experimental-client.md)
-
-
-## Hooks
-
-RediBox has a built in hook loading system and has plenty of published hook modules that support many of the common Redis use cases and provide additional functionality.
-
-#### RediBox Hooks
- - [Cache](https://github.com/redibox/cache) - Redis as a cache layer made simple.
- - [Job](https://github.com/redibox/job) - High performance, robust and flexible queue/worker system powered by redis.
- - [Memset](https://github.com/redibox/memset) - Synchronised data sets stored in memory across all servers - for quick synchronous access to data that is commonly used but not likely to update frequently.
- - [Schedule](https://github.com/redibox/schedule) - Cross server task scheduling made easy.
- - [Throttle](https://github.com/redibox/throttle) - Provides lua scripts to throttle things, i.e. 100 inbound http reqs per user every 10secs
- - [Trend](https://github.com/redibox/trend) - Track trending data with Node - using Bitly Forget-Table type data structures.
- - [API](https://github.com/redibox/api) - A JSON API for RediBox. (Work in progress).
 
 #### Public User Hooks
 
