@@ -17,13 +17,13 @@ RediBox is a NodeJS library which interacts with Redis to provide solutions to c
 
 The additional features RediBox offers are provided as [extensible hooks](/docs/creating-custom-hooks.md) which can be used on a per project level:
 
- - [Cache](https://github.com/redibox/cache) - Redis as a cache layer made simple.
- - [Job](https://github.com/redibox/job) - High performance, robust and flexible queue/worker system powered by redis.
+ - [Cache](https://github.com/redibox/cache) - Flexible data caching service.
+ - [Job](https://github.com/redibox/job) - High performance, robust and flexible queue/worker system.
+ - [Schedule](https://github.com/redibox/schedule) - Cross server task scheduling.
  - [Memset](https://github.com/redibox/memset) - Synchronised data sets stored in memory across all servers - for quick synchronous access to data that is commonly used but not likely to update frequently.
- - [Schedule](https://github.com/redibox/schedule) - Cross server task scheduling made easy.
  - [Throttle](https://github.com/redibox/throttle) - Provides lua scripts to throttle things, i.e. 100 inbound http reqs per user every 10secs
- - [Trend](https://github.com/redibox/trend) - Track trending data with Node - using Bitly Forget-Table type data structures.
- - [API](https://github.com/redibox/api) - A JSON API for RediBox. (Work in progress).
+ - [Trend](https://github.com/redibox/trend) - Track trending data using Bitly Forget-Table type data structures.
+ - [API](https://github.com/redibox/api) - A JSON API for RediBox (Work in progress).
 
 ## Getting Started
 
