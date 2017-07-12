@@ -1,6 +1,6 @@
-import EventEmitter from 'eventemitter3';
+const EventEmitter = require('eventemitter3');
 
-class BaseHook extends EventEmitter {
+module.exports = class extends EventEmitter {
 
   constructor(name) {
     super();
@@ -129,6 +129,4 @@ class BaseHook extends EventEmitter {
    * @returns {string}
    */
   toEventName = eventName => `hook:${this.name}:${eventName}`;
-}
-
-export default BaseHook;
+};

@@ -1,9 +1,9 @@
-import BaseHook from './BaseHook';
+const BaseHook = require('./BaseHook');
 
 /**
  * Provides cluster utilities if in cluster mode
  */
-export default class ClusterHook extends BaseHook {
+module.exports = class extends BaseHook {
   constructor() {
     super('cluster');
     this._mountToCore = true;
@@ -118,4 +118,4 @@ export default class ClusterHook extends BaseHook {
   isCluster() {
     return this.core.options.redis.cluster;
   }
-}
+};
