@@ -47,13 +47,13 @@ const RediBox = new Redibox({
   }
 }); // optional callback for bootstrap ready status or use events:
 
-RediBox.on('ready' clientStatus => {
+RediBox.on('ready', clientStatus => {
   RediBox.log.info(clientStatus); // internal redibox instance of winston if needed.
   // use cache module to set a cached value with a 60 second validity time.
   RediBox.hooks.cache.set('myKey', 'myVal', 60); // use a callback or a promise
 });
 
-RediBox.on('error' error => {
+RediBox.on('error', error => {
   RediBox.log.error(error); // internal redibox instance of winston if needed.
 });
 ```
