@@ -24,17 +24,17 @@
  *
  */
 
-import { createHash } from 'crypto';
-import { sep, join, resolve } from 'path';
-import { Logger, transports } from 'winston';
-import { existsSync, readFileSync } from 'fs';
+const { createHash } = require('crypto');
+const { sep, join, resolve } = require('path');
+const { Logger, transports } = require('winston');
+const { existsSync, readFileSync } = require('fs');
 
 /**
  * Generates from sha1 sum from an object.
  * @param data
  * @returns {*}
  */
-export function sha1sum(data) {
+function sha1sum(data) {
   return createHash('sha1')
     .update(JSON.stringify(data))
     .digest('hex');
@@ -48,7 +48,7 @@ export function sha1sum(data) {
  */
 let _timestamp;
 let _ncalls = 0;
-export function getTimeStamp() {
+function getTimeStamp() {
   if (!_timestamp || ++_ncalls > 1000) {
     _timestamp = Date.now();
     _ncalls = 0;
@@ -65,7 +65,7 @@ export function getTimeStamp() {
  * @param limit
  * @returns {Function}
  */
-export function throttle(func, limit) {
+function throttle(func, limit) {
   let wait = false;                    // Initially, we're not waiting
   return function _throttle(...args) { // We return a throttled function
     if (!wait) {                       // If we're not waiting
@@ -84,7 +84,7 @@ export function throttle(func, limit) {
  * @param path
  * @returns {*}
  */
-export function deepGet(obj, path) {
+function deepGet(obj, path) {
   let tmpObj = obj;
   path.split('.').forEach((key) => {
     if (!tmpObj || !Object.hasOwnProperty.call(tmpObj, key)) {
@@ -102,7 +102,7 @@ export function deepGet(obj, path) {
  * @param {Function} done  after count condition met callback
  * @returns {Function} After runner
  */
-export function after(n, done) {
+function after(n, done) {
   let times = n;
   return () => {
     times -= 1;
@@ -117,7 +117,7 @@ export function after(n, done) {
  * @param context
  * @returns {Function}
  */
-export function once(fn, context) {
+function once(fn, context) {
   let called = false;
   return function onceInternal(...args) {
     if (!called) {
@@ -132,14 +132,14 @@ export function once(fn, context) {
  * @param item
  * @returns {*|boolean}
  */
-export function isFunction(item) {
+function isFunction(item) {
   return (item && typeof item === 'function');
 }
 
 /**
  * Empty callback filler func.
  */
-export function noop() {
+function noop() {
 }
 
 /**
@@ -148,7 +148,7 @@ export function noop() {
  * @param callback
  * @returns {*}
  */
-export function nodify(promise, callback) {
+function nodify(promise, callback) {
   if (callback) {
     // prevent any callback exceptions getting swallowed by the Promise handlers
     const queueThrow = (e) => {
@@ -178,7 +178,7 @@ export function nodify(promise, callback) {
  * @param {Object} options logging level, defaults to warn
  * @returns {Logger} Winston Logger
  */
-export function createLogger(options) {
+function createLogger(options) {
   return new Logger({
     transports: [
       new (transports.Console)(options),
@@ -191,7 +191,7 @@ export function createLogger(options) {
  * @param item
  * @returns {boolean}
  */
-export function isObject(item) {
+function isObject(item) {
   return (item && typeof item === 'object' && !Array.isArray(item) && item !== null);
 }
 
@@ -199,7 +199,7 @@ export function isObject(item) {
  * Generate a random integer between two numbers
  * @returns {number}
  */
-export function randomInt() {
+function randomInt() {
   /* eslint no-bitwise:0 */
   return Math.floor(Math.random() * 0x100000000 | 0).toString(16);
 }
@@ -209,7 +209,7 @@ export function randomInt() {
  * @param target
  * @param source
  */
-export function mergeDeep(target, source) {
+function mergeDeep(target, source) {
   if (isObject(target) && isObject(source)) {
     /* eslint no-restricted-syntax: 0 */
     for (const key in source) {
@@ -224,7 +224,7 @@ export function mergeDeep(target, source) {
   return target;
 }
 
-export function arrayChunks(array, chunkSize) {
+function arrayChunks(array, chunkSize) {
   const results = [];
   for (let i = 0, len = array.length; i < len; i += chunkSize) {
     results.push(array.slice(i, i + chunkSize));
@@ -237,7 +237,7 @@ export function arrayChunks(array, chunkSize) {
  * @param string
  * @returns {*}
  */
-export function tryJSONParse(string) {
+function tryJSONParse(string) {
   try {
     return JSON.parse(string);
   } catch (jsonError) {
@@ -250,7 +250,7 @@ export function tryJSONParse(string) {
  * @param data
  * @returns {*}
  */
-export function tryJSONStringify(data) {
+function tryJSONStringify(data) {
   try {
     return JSON.stringify(data);
   } catch (jsonError) {
@@ -265,7 +265,7 @@ export function tryJSONStringify(data) {
  * @returns {Object} Iterator interface.
  * @api public
  */
-export function loadPackageJSON(root = process.cwd()) {
+function loadPackageJSON(root = process.cwd()) {
   if (root === sep) {
     return undefined;
   }
@@ -286,3 +286,23 @@ export function loadPackageJSON(root = process.cwd()) {
 
   return undefined;
 }
+
+module.exports = {
+  loadPackageJSON,
+  tryJSONStringify,
+  tryJSONParse,
+  arrayChunks,
+  mergeDeep,
+  randomInt,
+  isObject,
+  createLogger,
+  nodify,
+  noop,
+  isFunction,
+  once,
+  after,
+  deepGet,
+  throttle,
+  getTimeStamp,
+  sha1sum,
+};

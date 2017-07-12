@@ -1,4 +1,4 @@
-import { loadPackageJSON, mergeDeep } from './../utils';
+const { loadPackageJSON, mergeDeep } = require('./../utils');
 
 const hookPrefix = 'redibox-hook';
 const hookRegexReplace = new RegExp(`@?[a-zA-Z-_0-9.]*?\/?${hookPrefix}-`);
@@ -109,7 +109,7 @@ function loadHook(UserHook, keyName, core) {
  * @param core
  * @returns {*}
  */
-export function importPackageHooks(core) {
+function importPackageHooks(core) {
   const packageJson = loadPackageJSON();
 
   if (!packageJson) {
@@ -158,7 +158,7 @@ export function importPackageHooks(core) {
  * Loads hooks provided in core hooks config
  * @param core
  */
-export function importConfigHooks(core) {
+function importConfigHooks(core) {
   const packageHooks = Object.keys(core.options.hooks);
   const numHooks = packageHooks.length;
 
@@ -192,7 +192,13 @@ export function importConfigHooks(core) {
  * @param core
  * @returns {*}
  */
-export default core => Promise.all([
-  importConfigHooks(core),
-  importPackageHooks(core),
-]);
+module.exports = {
+  importConfigHooks,
+  importPackageHooks,
+  default(core) {
+    return Promise.all([
+      importConfigHooks(core),
+      importPackageHooks(core),
+    ]);
+  },
+};
