@@ -41,12 +41,15 @@ function loadHook(UserHook, keyName, core) {
       return resolve();
     }
 
+    // TODO Doesn't work without Babel
+
     // confirm the user hook actually extends the Hook class
-    const protoName = Object.getPrototypeOf(UserHook).name;
-    if (protoName !== 'BaseHook') {
-      core.log.warn(`Hook '${keyName}': does not extend 'BaseHook', skipping!`);
-      return resolve();
-    }
+    // const protoName = Object.getPrototypeOf(UserHook).name;
+
+    // if (protoName !== 'BaseHook') {
+    //   core.log.warn(`Hook '${keyName}': does not extend 'BaseHook', skipping!`);
+    //   return resolve();
+    // }
 
     // start mounting the hook
     const userHook = new UserHook();
