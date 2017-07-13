@@ -2,6 +2,8 @@ const EventEmitter = require('eventemitter3');
 
 module.exports = class extends EventEmitter {
 
+  static className = 'BaseHook';
+
   constructor(name) {
     super();
     this.core = {};
