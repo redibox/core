@@ -7,5 +7,4 @@ module.exports = Object.assign({}, {
   default: core,
   defaults,
   BaseHook,
-  // utils,
 }, utils);
