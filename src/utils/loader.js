@@ -1,4 +1,4 @@
-import { loadPackageJSON, mergeDeep } from './../utils';
+const { loadPackageJSON, mergeDeep } = require('./../utils');
 
 const hookPrefix = 'redibox-hook';
 const hookRegexReplace = new RegExp(`@?[a-zA-Z-_0-9.]*?${hookPrefix}-`);
@@ -41,8 +41,9 @@ function loadHook(UserHook, keyName, core) {
       return resolve();
     }
 
-    // confirm the user hook actually extends the Hook class
-    const protoName = Object.getPrototypeOf(UserHook).name;
+    // confirm the user hook actually extends the BaseHook class
+    const protoName = Object.getPrototypeOf(UserHook).className;
+
     if (protoName !== 'BaseHook') {
       core.log.warn(`Hook '${keyName}': does not extend 'BaseHook', skipping!`);
       return resolve();
@@ -109,7 +110,7 @@ function loadHook(UserHook, keyName, core) {
  * @param core
  * @returns {*}
  */
-export function importPackageHooks(core) {
+function importPackageHooks(core) {
   const packageJson = loadPackageJSON();
 
   if (!packageJson) {
@@ -158,7 +159,7 @@ export function importPackageHooks(core) {
  * Loads hooks provided in core hooks config
  * @param core
  */
-export function importConfigHooks(core) {
+function importConfigHooks(core) {
   const packageHooks = Object.keys(core.options.hooks);
   const numHooks = packageHooks.length;
 
@@ -192,7 +193,13 @@ export function importConfigHooks(core) {
  * @param core
  * @returns {*}
  */
-export default core => Promise.all([
-  importConfigHooks(core),
-  importPackageHooks(core),
-]);
+module.exports = {
+  importConfigHooks,
+  importPackageHooks,
+  default(core) {
+    return Promise.all([
+      importConfigHooks(core),
+      importPackageHooks(core),
+    ]);
+  },
+};

@@ -24,7 +24,7 @@
  *
  */
 
-export default {
+module.exports = {
 
   /**
    * Not really needed due to redis `set` options, just for niceness

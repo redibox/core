@@ -1,20 +1,20 @@
-import EventEmitter from 'eventemitter3';
-import BaseHook from './BaseHook';
+const EventEmitter = require('eventemitter3');
+const BaseHook = require('./BaseHook');
 
-import {
+const {
   once,
   isObject,
   tryJSONParse,
   tryJSONStringify,
   getTimeStamp,
-} from './../utils';
+} = require('./../utils');
 
 /**
  * Provides additional pubsub utilities
  */
 // TODO pattern subs
 // TODO subscribeXof
-export default class PubSubHook extends BaseHook {
+module.exports = class extends BaseHook {
   constructor() {
     super('pubsub');
     this._mountToCore = true;
@@ -324,5 +324,4 @@ export default class PubSubHook extends BaseHook {
    */
   removeEventPrefix = eventName =>
     eventName.slice(this.options.eventPrefix.length + 1, eventName.length);
-
-}
+};
