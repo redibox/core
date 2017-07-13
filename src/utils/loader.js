@@ -10,7 +10,7 @@ const hookRegexReplace = new RegExp(`@?[a-zA-Z-_0-9.]*?${hookPrefix}-`);
  */
 function tryRequire(module) {
   try {
-    /* eslint global-require: 0 */
+    // eslint-disable-next-line import/no-dynamic-require, global-require
     return require(module);
   } catch (e) {
     return undefined;
@@ -77,7 +77,7 @@ function loadHook(UserHook, keyName, core) {
     const hookTimer = setTimeout(() => {
       reject(new Error(
         `Hook '${keyName}' timed out while initializing (${userHook.hookTimeout}ms)
-       Check to see if you're not missing a callback or a promise resolve/reject.`
+       Check to see if you're not missing a callback or a promise resolve/reject.`,
       ));
     }, userHook.hookTimeout);
 

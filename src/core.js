@@ -294,13 +294,13 @@ module.exports = class RediBox extends EventEmitter {
       // quick validations
       if (!Object.hasOwnProperty.call(script, 'keys')) {
         return this.log.warn(
-          `Script '${keyLower}' is missing required property 'key'! ...SKIPPED!`
+          `Script '${keyLower}' is missing required property 'key'! ...SKIPPED!`,
         );
       }
 
       if (!Object.hasOwnProperty.call(script, 'lua')) {
         return this.log.warn(
-          `Script '${keyLower}' from is missing required property 'lua'! ...SKIPPED!`
+          `Script '${keyLower}' from is missing required property 'lua'! ...SKIPPED!`,
         );
       }
 

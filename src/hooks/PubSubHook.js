@@ -45,7 +45,7 @@ module.exports = class extends BaseHook {
             this.clients.subscriber.on('message', this._onMessage);
             // this.clients.subscriber.on('pmessage', this._onPatternMessage);
             return Promise.resolve();
-          })
+          }),
       );
     }
 
@@ -156,7 +156,7 @@ module.exports = class extends BaseHook {
   subscribeOnce(channels, listener, timeout) {
     if (!this.options.subscriber) {
       return Promise.reject(
-        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.'),
       );
     }
     const promises = [];
@@ -217,7 +217,7 @@ module.exports = class extends BaseHook {
   subscribeOnceOf(channels, listener, timeout) {
     if (!this.options.subscriber) {
       return Promise.reject(
-        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.'),
       );
     }
 
@@ -251,7 +251,7 @@ module.exports = class extends BaseHook {
   subscribe(channels, listener) {
     if (!this.options.subscriber) {
       return Promise.reject(
-        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.'),
       );
     }
 
