@@ -1,4 +1,10 @@
-export * from './utils';
-export { default } from './core';
-export { default as defaults } from './defaults';
-export { default as BaseHook } from './hooks/BaseHook';
+const core = require('./core');
+const defaults = require('./defaults');
+const BaseHook = require('./hooks/BaseHook');
+const utils = require('./utils');
+
+module.exports = Object.assign({}, {
+  default: core,
+  defaults,
+  BaseHook,
+}, utils);

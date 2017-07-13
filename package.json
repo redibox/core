@@ -30,22 +30,13 @@
     "ioredis"
   ],
   "scripts": {
-    "build": "babel src --out-dir lib",
-    "build-watch": "babel src --watch --out-dir lib",
-    "example": "cd example && ./../node_modules/.bin/babel-node app.js",
+    "example": "cd example && node app.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run lint && npm run build",
     "lint": "./node_modules/.bin/eslint ./src",
-    "test": "./node_modules/.bin/babel-node -- ./node_modules/.bin/babel-istanbul cover --report lcov _mocha "
+    "test": "node -- ./node_modules/.bin/babel-istanbul cover --report lcov _mocha "
   },
   "devDependencies": {
-    "babel-cli": "^6.14.0",
-    "babel-eslint": "^6.1.2",
-    "babel-istanbul": "^0.11.0",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-transform-class-properties": "^6.11.5",
-    "babel-preset-es2015-node6": "^0.3.0",
-    "babel-preset-stage-0": "^6.5.0",
     "benchmark": "^2.1.1",
     "chai": "^3.5.0",
     "coveralls": "^2.11.14",
