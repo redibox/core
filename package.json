@@ -33,7 +33,7 @@
     "example": "cd example && node app.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run lint && npm run build",
-    "lint": "./node_modules/.bin/eslint ./src",
+    "lint": "eslint ./src",
     "test": "node -- ./node_modules/.bin/babel-istanbul cover --report lcov _mocha "
   },
   "devDependencies": {

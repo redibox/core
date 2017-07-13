@@ -1,7 +1,7 @@
 const { loadPackageJSON, mergeDeep } = require('./../utils');
 
 const hookPrefix = 'redibox-hook';
-const hookRegexReplace = new RegExp(`@?[a-zA-Z-_0-9.]*?\/?${hookPrefix}-`);
+const hookRegexReplace = new RegExp(`@?[a-zA-Z-_0-9.]*?${hookPrefix}-`);
 
 /**
  *
