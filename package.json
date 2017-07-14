@@ -46,6 +46,7 @@
     "babel-plugin-transform-class-properties": "^6.11.5",
     "babel-preset-es2015-node6": "^0.3.0",
     "babel-preset-stage-0": "^6.5.0",
+    "babel-preset-stage-2": "^6.24.1",
     "benchmark": "^2.1.1",
     "chai": "^3.5.0",
     "coveralls": "^2.11.14",
