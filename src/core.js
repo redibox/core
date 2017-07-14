@@ -24,28 +24,27 @@
  *
  */
 
-import cuid from 'cuid';
-import Redis from 'ioredis';
-import EventEmitter from 'eventemitter3';
+const cuid = require('cuid');
+const Redis = require('ioredis');
+const EventEmitter = require('eventemitter3');
 
-import { hostname } from 'os';
-import Promise from 'bluebird';
-import scripts from './scripts';
-import defaults from './defaults';
-import hookLoader from './utils/loader';
+const { hostname } = require('os');
+const Promise = require('bluebird');
+const scripts = require('./scripts');
+const defaults = require('./defaults');
+const hookLoader = require('./utils/loader').default;
 
-import {
+const {
   noop,
   mergeDeep,
   isFunction,
   createLogger,
   getTimeStamp,
-} from './utils';
+} = require('./utils');
 
 const HOST_NAME = hostname();
 
-export default class RediBox extends EventEmitter {
-
+module.exports = class RediBox extends EventEmitter {
   /**
    * @class RediBox
    * RediBox Core Service
@@ -295,13 +294,13 @@ export default class RediBox extends EventEmitter {
       // quick validations
       if (!Object.hasOwnProperty.call(script, 'keys')) {
         return this.log.warn(
-          `Script '${keyLower}' is missing required property 'key'! ...SKIPPED!`
+          `Script '${keyLower}' is missing required property 'key'! ...SKIPPED!`,
         );
       }
 
       if (!Object.hasOwnProperty.call(script, 'lua')) {
         return this.log.warn(
-          `Script '${keyLower}' from is missing required property 'lua'! ...SKIPPED!`
+          `Script '${keyLower}' from is missing required property 'lua'! ...SKIPPED!`,
         );
       }
 
@@ -341,5 +340,4 @@ export default class RediBox extends EventEmitter {
    * @returns {string}
    */
   toEventName = eventName => `core:${eventName}`;
-
-}
+};

@@ -1,5 +1,5 @@
-import { assert } from 'chai';
-import RediBox from './../../src';
+const { assert } = require('chai');
+const RediBox = require('./../../src').default;
 
 const clusterConfig = {
   log: { level: 'error' },

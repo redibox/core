@@ -1,6 +1,6 @@
-/* eslint no-underscore-dangle: 0 */
-import { assert } from 'chai';
-import RediBox, { BaseHook } from './../../src';
+const { assert } = require('chai');
+const RediBox = require('./../../src').default;
+const { BaseHook } = require('./../../src');
 
 class CoolHook extends BaseHook {
   constructor() {

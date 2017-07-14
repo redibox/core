@@ -1,6 +1,6 @@
-/* eslint no-underscore-dangle: 0 */
-import { assert } from 'chai';
-import RediBox, { after } from './../../src';
+const { assert } = require('chai');
+const RediBox = require('./../../src').default;
+const { after } = require('./../../src');
 
 describe('core hooks - pubsub', () => {
   it('Should create a subscriber client if option set', done => {
