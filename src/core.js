@@ -221,7 +221,6 @@ module.exports = class RediBox extends EventEmitter {
     if (this.clients.default) {
       this.clients.default.quit();
     }
-
     // todo loop over custom clients
 
     process.removeListener('SIGTERM', this.quit);

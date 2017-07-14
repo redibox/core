@@ -1,5 +1,4 @@
-const { assert } = require('chai');
-const RediBox = require('./../../src').default;
+const RediBox = require('./../..').default;
 
 const clusterConfig = {
   log: { level: 'error' },
@@ -37,10 +36,10 @@ const clusterConfig = {
 describe('core hooks - cluster', () => {
   it('Should return an empty arrays of node addresses when not a cluster', function testB(done) {
     const redibox = new RediBox(() => {
-      assert.isFalse(redibox.options.redis.cluster);
-      assert.deepEqual(redibox.cluster.getMasters(), []);
-      assert.deepEqual(redibox.cluster.getSlaves(), []);
-      assert.deepEqual(redibox.cluster.getNodes(), []);
+      expect(redibox.options.redis.cluster).toBe(false);
+      expect(redibox.cluster.getMasters()).toEqual([]);
+      expect(redibox.cluster.getSlaves()).toEqual([]);
+      expect(redibox.cluster.getNodes()).toEqual([]);
       done();
     });
     redibox.on('error', (e) => {
@@ -48,17 +47,17 @@ describe('core hooks - cluster', () => {
     });
   });
 
-  it('Should return an array of redis slave node addresses', function testB(done) {
+  it('Should return an array of redis slave node addresses', (done) => {
     const redibox = new RediBox(clusterConfig, () => {
-      assert.isTrue(redibox.options.redis.cluster);
-      assert.isObject(redibox.clients.default.connectionPool.nodes.slave);
+      expect(redibox.options.redis.cluster).toBe(true);
+      expect(typeof redibox.clients.default.connectionPool.nodes.slave).toBe('object');
       const slavesExpected = ['127.0.0.1:30004', '127.0.0.1:30005', '127.0.0.1:30006'];
       const slaves = redibox.cluster.getSlaves();
-      assert.isArray(slaves);
-      assert.equal(slaves.length, 3);
-      assert.oneOf(slaves[0], slavesExpected);
-      assert.oneOf(slaves[1], slavesExpected);
-      assert.oneOf(slaves[2], slavesExpected);
+      expect(Array.isArray(slaves)).toBe(true);
+      expect(slaves).toHaveLength(3);
+      expect(slavesExpected).toContain(slaves[0]);
+      expect(slavesExpected).toContain(slaves[1]);
+      expect(slavesExpected).toContain(slaves[2]);
       redibox.disconnect();
       done();
     });
@@ -67,17 +66,17 @@ describe('core hooks - cluster', () => {
     });
   });
 
-  it('Should return an array of redis master node addresses', function testB(done) {
+  it('Should return an array of redis master node addresses', (done) => {
     const redibox = new RediBox(clusterConfig, () => {
-      assert.isTrue(redibox.options.redis.cluster);
-      assert.isObject(redibox.clients.default.connectionPool.nodes.master);
+      expect(redibox.options.redis.cluster).toBe(true);
+      expect(typeof redibox.clients.default.connectionPool.nodes.master).toBe('object');
       const mastersExpected = ['127.0.0.1:30001', '127.0.0.1:30002', '127.0.0.1:30003'];
       const masters = redibox.cluster.getMasters();
-      assert.isArray(masters);
-      assert.equal(masters.length, 3);
-      assert.oneOf(masters[0], mastersExpected);
-      assert.oneOf(masters[1], mastersExpected);
-      assert.oneOf(masters[2], mastersExpected);
+      expect(Array.isArray(masters)).toBe(true);
+      expect(masters).toHaveLength(3);
+      expect(mastersExpected).toContain(masters[0]);
+      expect(mastersExpected).toContain(masters[1]);
+      expect(mastersExpected).toContain(masters[2]);
       redibox.disconnect();
       done();
     });
@@ -88,22 +87,21 @@ describe('core hooks - cluster', () => {
 
   it('Should return an array of all redis node addresses', function testB(done) {
     const redibox = new RediBox(clusterConfig, () => {
-      assert.isTrue(redibox.cluster.isCluster());
-      assert.isObject(redibox.clients.default.connectionPool.nodes.all);
+      expect(redibox.options.redis.cluster).toBe(true);
+      expect(typeof redibox.clients.default.connectionPool.nodes.all).toBe('object');
       const allExpected = [
         '127.0.0.1:30001', '127.0.0.1:30002', '127.0.0.1:30003',
         '127.0.0.1:30006', '127.0.0.1:30004', '127.0.0.1:30005',
       ];
       const all = redibox.cluster.getNodes();
-      assert.isArray(all);
-      assert.equal(all.length, 6);
-      assert.oneOf(all[0], allExpected);
-      assert.oneOf(all[1], allExpected);
-      assert.oneOf(all[2], allExpected);
-      assert.oneOf(all[3], allExpected);
-      assert.oneOf(all[4], allExpected);
-      assert.oneOf(all[5], allExpected);
-     // redibox.disconnect();
+      expect(Array.isArray(all)).toBe(true);
+      expect(all).toHaveLength(6);
+      expect(allExpected).toContain(all[0]);
+      expect(allExpected).toContain(all[1]);
+      expect(allExpected).toContain(all[2]);
+      expect(allExpected).toContain(all[3]);
+      expect(allExpected).toContain(all[4]);
+      expect(allExpected).toContain(all[5]);
       done();
     });
     redibox.on('error', (e) => {
@@ -112,11 +110,11 @@ describe('core hooks - cluster', () => {
   });
 
   // TODO - accessing an individual redis node breaks ioredis - wut o.O
-  it('Should return an individual cluster node connection', function testB(done) {
+  it('Should return an individual cluster node connection', (done) => {
     const redibox = new RediBox(clusterConfig, () => {
       const node1 = redibox.cluster.getNodeClient('127.0.0.1:30001');
       // NEVER GETS HERE, just hangs or disconnects
-      assert.equal(node1.options.port, 30001);
+      expect(node1.options.port).toBe(30001);
       done();
     });
     redibox.on('error', (e) => {
@@ -124,14 +122,14 @@ describe('core hooks - cluster', () => {
     });
   });
 
-  it('Should proxy redis commands to all redis node masters', function testB(done) {
+  it('Should proxy redis commands to all redis node masters', (done) => {
     const redibox = new RediBox(clusterConfig, () => {
-      assert.isTrue(redibox.cluster.isCluster());
-      redibox.cluster.flushall().then(function (result) {
-        assert.equal(result.length, 3);
-        assert.equal(result[0], 'OK');
-        assert.equal(result[1], 'OK');
-        assert.equal(result[2], 'OK');
+      expect(redibox.cluster.isCluster()).toBe(true);
+      redibox.cluster.flushall().then((result) => {
+        expect(result).toHaveLength(3);
+        expect(result[0]).toBe('OK');
+        expect(result[1]).toBe('OK');
+        expect(result[2]).toBe('OK');
         redibox.disconnect();
         done();
       });

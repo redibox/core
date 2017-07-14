@@ -1,28 +1,27 @@
-const { assert } = require('chai');
-const RediBox = require('./../../src').default;
-const { after } = require('./../../src');
+const RediBox = require('./../..').default;
+const { after } = require('./../..');
 
 describe('core hooks - pubsub', () => {
-  it('Should create a subscriber client if option set', done => {
+  it('Should create a subscriber client if option set', (done) => {
     const redibox = new RediBox({ pubsub: { subscriber: true } });
     redibox.on('ready', () => {
-      assert.isDefined(redibox.pubsub.clients.subscriber);
+      expect(redibox.pubsub.clients.subscriber).toBeDefined();
       redibox.disconnect();
       done();
     });
   });
 
-  it('Should create a publisher client if option set', done => {
+  it('Should create a publisher client if option set', (done) => {
     const redibox = new RediBox({ pubsub: { publisher: true } });
     redibox.on('ready', () => {
-      assert.isDefined(redibox.pubsub.clients.publisher);
+      expect(redibox.pubsub.clients.publisher).toBeDefined();
       redibox.disconnect();
       done();
     });
   });
 
-  it('Should subscribeOnce and publish events from multiple channels', function testB(done) {
-    this.timeout(3000);
+  it('Should subscribeOnce and publish events from multiple channels', (done) => {
+    setTimeout(done, 3000);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
@@ -39,8 +38,8 @@ describe('core hooks - pubsub', () => {
         'requestID-123456:request:dataPart1',
         'requestID-123456:request:dataPart2',
         'requestID-123456:request:dataPart3',
-      ], message => { // on message received listener
-        assert.isUndefined(message.timeout);
+      ], (message) => { // on message received listener
+        expect(message.timeout).toBeUndefined();
         done3();
       }, 3000).then(() => {
         redibox.pubsub.publish([
@@ -52,13 +51,13 @@ describe('core hooks - pubsub', () => {
           someArray: [1, 2, 3, 4, 5],
           somethingElse: 'foobar',
         });
-      }).catch(error => assert.isNull(error));
+      }).catch(error => expect(error).toBeNull());
     });
   });
 
 
-  it('Should subscribeOnce and timeout if option set', function testB(done) {
-    this.timeout(500);
+  it('Should subscribeOnce and timeout if option set', (done) => {
+    setTimeout(done, 500);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
@@ -73,16 +72,16 @@ describe('core hooks - pubsub', () => {
     redibox.once('ready', () => {
       redibox.pubsub.subscribeOnce([
         'requestID-123456:request:dataPart1',
-      ], message => { // on message received listener
-        assert.isDefined(message.timeout);
+      ], (message) => { // on message received listener
+        expect(message.timeout).toBeDefined();
         done1();
       }, 25).then(() => {
-      }).catch(error => assert.isNull(error));
+      }).catch(error => expect(error).toBeNull());
     });
   });
 
-  it('Should subscribeOnceOf and timeout if option set', function testB(done) {
-    this.timeout(500);
+  it('Should subscribeOnceOf and timeout if option set', (done) => {
+    setTimeout(done, 500);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
@@ -98,19 +97,20 @@ describe('core hooks - pubsub', () => {
       redibox.pubsub.subscribeOnceOf([
         'requestID-123456:request:dataPart1',
         'requestID-123456:request:dataPart2',
-      ], message => { // on message received listener
-        assert.isDefined(message.timeout);
+      ], (message) => { // on message received listener
+        expect(message.timeout).toBeDefined();
         done1();
       }, 25).then(() => {
-      }).catch(error => assert.isNull(error));
+      }).catch(error => expect(error).toBeNull());
     });
   });
 
-  it('Should subscribe and publish events from multiple channels many times', function testB(done) {
-    /* eslint no-var:0 */
-    var listener;
-    this.timeout(9000);
-    const redibox = new RediBox({ logRedisErrors: true, pubsub: { subscriber: true, publisher: true} });
+  it('Should subscribe and publish events from multiple channels many times', (done) => {
+    let listener;
+    setTimeout(done, 9000);
+    const redibox = new RediBox(
+      { logRedisErrors: true, pubsub: { subscriber: true, publisher: true } },
+    );
 
     const done10 = after(9, () => {
       redibox.pubsub.unsubscribe([
@@ -123,8 +123,8 @@ describe('core hooks - pubsub', () => {
       });
     });
 
-    listener = message => { // on message received listener
-      assert.isUndefined(message.timeout);
+    listener = (message) => { // on message received listener
+      expect(message.timeout).toBeUndefined();
       done10();
     };
 
@@ -155,8 +155,8 @@ describe('core hooks - pubsub', () => {
     });
   });
 
-  it('Should subscribeOnce of multiple channels and unsub from all chans on the first event', function testB(done) {
-    this.timeout(3000);
+  it('Should subscribeOnce of multiple channels and unsub from all chans on the first event', (done) => {
+    setTimeout(done, 3000);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
@@ -173,8 +173,8 @@ describe('core hooks - pubsub', () => {
         'requestID-123456:request:dataPart1',
         'requestID-123456:request:dataPart2',
         'requestID-123456:request:dataPart3',
-      ], message => { // on message received listener
-        assert.isUndefined(message.timeout);
+      ], (message) => { // on message received listener
+        expect(message.timeout).toBeUndefined();
         done3();
       }, 3000).then(() => {
         redibox.pubsub.publish([
@@ -186,7 +186,7 @@ describe('core hooks - pubsub', () => {
           someArray: [1, 2, 3, 4, 5],
           somethingElse: 'foobar',
         });
-      }).catch(error => assert.isNull(error));
+      }).catch(error => expect(error).toBeNull());
     });
   });
 });

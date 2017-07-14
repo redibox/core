@@ -1,5 +1,4 @@
-const { assert } = require('chai');
-const RediBox = require('./../../src').default;
+const RediBox = require('../../').default;
 
 const clusterConfig = {
   log: { level: 'error' },
@@ -43,16 +42,16 @@ const clusterConfig = {
  */
 
 describe('cluster', () => {
-  it('Should connect to a cluster and be able to read from slaves and masters', function testA(done) {
-    this.timeout(4000);
+  it('Should connect to a cluster and be able to read from slaves and masters', (done) => {
+    setTimeout(done, 4000);
     const config = clusterConfig;
     config.redis.scaleReads = 'all';
     const redibox = new RediBox(config, (err) => {
-      assert.isUndefined(err);
-      assert.isTrue(redibox.options.redis.cluster);
-      assert.isDefined(redibox.clients.default);
-      assert.isDefined(redibox.client);
-      assert.isDefined(redibox.cluster.readMode(), 'all');
+      expect(err).toBeUndefined();
+      expect(redibox.options.redis.cluster).toBeTruthy();
+      expect(redibox.clients.default).toBeDefined();
+      expect(redibox.client).toBeDefined();
+      expect(redibox.cluster.readMode(), 'all').toBeDefined();
       redibox.quit();
       done();
     });

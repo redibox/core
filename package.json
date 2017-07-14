@@ -36,7 +36,8 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run lint && npm run build",
     "lint": "eslint ./src",
-    "test": "babel-node -- ./node_modules/.bin/babel-istanbul cover --report lcov _mocha "
+    "unit": "jest src --forceExit",
+    "test": "jest src --forceExit --coverage"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -54,6 +55,7 @@
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0",
     "isparta": "^4.0.0",
+    "jest": "^20.0.4",
     "mocha": "^3.4.2",
     "sinon": "^2.3.8"
   },

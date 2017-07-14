@@ -1,5 +1,8 @@
 {
   "parser": "babel-eslint",
+  "env": {
+    "jest": true
+  },
   "extends": [
     "airbnb"
   ],
@@ -8,11 +11,5 @@
     "no-param-reassign": 0,
     "class-methods-use-this": 0,
     "no-plusplus": 0
-  },
-  "globals": {
-    "describe": true,
-    "it": true,
-    "before": true,
-    "after": true
   }
 }
