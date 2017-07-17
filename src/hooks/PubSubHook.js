@@ -1,20 +1,20 @@
-import EventEmitter from 'eventemitter3';
-import BaseHook from './BaseHook';
+const EventEmitter = require('eventemitter3');
+const BaseHook = require('./BaseHook');
 
-import {
+const {
   once,
   isObject,
   tryJSONParse,
   tryJSONStringify,
   getTimeStamp,
-} from './../utils';
+} = require('./../utils');
 
 /**
  * Provides additional pubsub utilities
  */
 // TODO pattern subs
 // TODO subscribeXof
-export default class PubSubHook extends BaseHook {
+module.exports = class extends BaseHook {
   constructor() {
     super('pubsub');
     this._mountToCore = true;
@@ -45,7 +45,7 @@ export default class PubSubHook extends BaseHook {
             this.clients.subscriber.on('message', this._onMessage);
             // this.clients.subscriber.on('pmessage', this._onPatternMessage);
             return Promise.resolve();
-          })
+          }),
       );
     }
 
@@ -156,7 +156,7 @@ export default class PubSubHook extends BaseHook {
   subscribeOnce(channels, listener, timeout) {
     if (!this.options.subscriber) {
       return Promise.reject(
-        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.'),
       );
     }
     const promises = [];
@@ -217,7 +217,7 @@ export default class PubSubHook extends BaseHook {
   subscribeOnceOf(channels, listener, timeout) {
     if (!this.options.subscriber) {
       return Promise.reject(
-        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.'),
       );
     }
 
@@ -251,7 +251,7 @@ export default class PubSubHook extends BaseHook {
   subscribe(channels, listener) {
     if (!this.options.subscriber) {
       return Promise.reject(
-        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.')
+        new Error('RediBox.pubsub \'subscriber\' config is set to disabled.'),
       );
     }
 
@@ -324,5 +324,4 @@ export default class PubSubHook extends BaseHook {
    */
   removeEventPrefix = eventName =>
     eventName.slice(this.options.eventPrefix.length + 1, eventName.length);
-
-}
+};

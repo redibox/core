@@ -1,6 +1,5 @@
-/* eslint no-underscore-dangle: 0 */
-import { assert } from 'chai';
-import RediBox, { BaseHook } from './../../src';
+const RediBox = require('../../src/index').default;
+const { BaseHook } = require('../../src/index');
 
 class CoolHook extends BaseHook {
   constructor() {
@@ -50,14 +49,14 @@ class CoolHook extends BaseHook {
 }
 
 describe('core hooks - loader', () => {
-  it('Should mount hooks to the core.hooks namespace', function testB(done) {
+  it('Should mount hooks to the core.hooks namespace', (done) => {
     const redibox = new RediBox({
       hooks: {
         cool: CoolHook,
       },
     }, () => {
-      assert.isTrue(redibox.hooks.hasOwnProperty('cool'));
-      assert.equal(redibox.hooks.cool.getClientCount(), 1);
+      expect(redibox.hooks.hasOwnProperty('cool')).toBe(true);
+      expect(redibox.hooks.cool.getClientCount()).toBe(1);
       redibox.disconnect();
       done();
     });
@@ -66,14 +65,14 @@ describe('core hooks - loader', () => {
     });
   });
 
-  it('Should merge default opts with user config to hook.options', function testB(done) {
+  it('Should merge default opts with user config to hook.options', (done) => {
     const redibox = new RediBox({
       hooks: {
         cool: CoolHook,
       },
     }, () => {
-      assert.isTrue(redibox.hooks.cool.options.hasOwnProperty('kittenSays'));
-      assert.equal(redibox.hooks.cool.options.kittenSays, 'meow');
+      expect(redibox.hooks.cool.options.hasOwnProperty('kittenSays')).toBe(true);
+      expect(redibox.hooks.cool.options.kittenSays).toBe('meow');
       redibox.disconnect();
       done();
     });
@@ -82,18 +81,18 @@ describe('core hooks - loader', () => {
     });
   });
 
-  it('Should unmount hook if requested', function testB(done) {
+  it('Should unmount hook if requested', (done) => {
     const redibox = new RediBox({
       hooks: {
         cool: CoolHook,
       },
     }, () => {
-      assert.isTrue(redibox.hooks.hasOwnProperty('cool'));
+      expect(redibox.hooks.hasOwnProperty('cool')).toBe(true);
       redibox.hooks.cool._unmount();
-      assert.isFalse(redibox.hooks.hasOwnProperty('cool'));
-      assert.isTrue(redibox.hasOwnProperty('cluster'));
+      expect(redibox.hooks.hasOwnProperty('cool')).toBe(false);
+      expect(redibox.hasOwnProperty('cluster')).toBe(true);
       redibox.cluster._unmount();
-      assert.isFalse(redibox.hasOwnProperty('cluster'));
+      expect(redibox.hasOwnProperty('cluster')).toBe(false);
       redibox.disconnect();
       done();
     });

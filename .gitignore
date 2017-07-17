@@ -39,3 +39,4 @@ nbproject
 test.js
 benchmark
 yarn.lock
+coverage
