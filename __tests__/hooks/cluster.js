@@ -34,7 +34,7 @@ const clusterConfig = {
 };
 
 describe('core hooks - cluster', () => {
-  it('Should return an empty arrays of node addresses when not a cluster', function testB(done) {
+  it('Should return an empty arrays of node addresses when not a cluster', (done) => {
     const redibox = new RediBox(() => {
       expect(redibox.options.redis.cluster).toBe(false);
       expect(redibox.cluster.getMasters()).toEqual([]);

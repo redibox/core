@@ -3,6 +3,7 @@ const RediBox = require('../../src/index').default;
 describe('core', () => {
   it('Should error when connecting to a offline redis server', (done) => {
     setTimeout(done, 200);
+    expect.assertions(1);
     const redibox = new RediBox({
       redis: { port: 9999, connectionTimeout: 150 },
     });
@@ -54,6 +55,7 @@ describe('core', () => {
 
   it('Should connect to redis using default config', (done) => {
     setTimeout(done, 9000);
+    expect.assertions(2);
     const redibox = new RediBox();
     redibox.once('ready', (status) => {
       expect(status).not.toBeNull();
@@ -92,6 +94,7 @@ describe('core', () => {
 
   it('Should be able to create custom clients using original config', (done) => {
     setTimeout(done, 2000);
+    expect.assertions(2);
     const redibox = new RediBox();
     redibox.createClient('fooBob', redibox).then(() => {
       expect(redibox.clients.fooBob).toBeDefined();
@@ -103,6 +106,7 @@ describe('core', () => {
 
   it('TODO: Should be able to create custom clients using custom config', (done) => {
     setTimeout(done, 2000);
+    expect.assertions(2);
     const redibox = new RediBox();
     redibox.createClient('fooBobCustom', redibox).then(() => {
       expect(redibox.clients.fooBobCustom).toBeDefined();

@@ -44,6 +44,7 @@ const clusterConfig = {
 describe('cluster', () => {
   it('Should connect to a cluster and be able to read from slaves and masters', (done) => {
     setTimeout(done, 4000);
+    expect.assertions(5);
     const config = clusterConfig;
     config.redis.scaleReads = 'all';
     const redibox = new RediBox(config, (err) => {

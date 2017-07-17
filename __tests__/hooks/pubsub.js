@@ -22,6 +22,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnce and publish events from multiple channels', (done) => {
     setTimeout(done, 3000);
+    expect.assertions(3);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
@@ -58,6 +59,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnce and timeout if option set', (done) => {
     setTimeout(done, 500);
+    expect.assertions(1);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
@@ -82,6 +84,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnceOf and timeout if option set', (done) => {
     setTimeout(done, 500);
+    expect.assertions(1);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
@@ -108,6 +111,7 @@ describe('core hooks - pubsub', () => {
   it('Should subscribe and publish events from multiple channels many times', (done) => {
     let listener;
     setTimeout(done, 9000);
+    expect.assertions(9);
     const redibox = new RediBox(
       { logRedisErrors: true, pubsub: { subscriber: true, publisher: true } },
     );
@@ -157,6 +161,7 @@ describe('core hooks - pubsub', () => {
 
   it('Should subscribeOnce of multiple channels and unsub from all chans on the first event', (done) => {
     setTimeout(done, 3000);
+    expect.assertions(1);
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
