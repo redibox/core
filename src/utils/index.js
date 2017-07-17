@@ -28,6 +28,7 @@ const { createHash } = require('crypto');
 const { sep, join, resolve } = require('path');
 const { Logger, transports } = require('winston');
 const { existsSync, readFileSync } = require('fs');
+const { dateNow } = require('./aliases');
 
 /**
  * Generates from sha1 sum from an object.
@@ -50,7 +51,7 @@ let _timestamp;
 let _ncalls = 0;
 function getTimeStamp() {
   if (!_timestamp || ++_ncalls > 1000) {
-    _timestamp = Date.now();
+    _timestamp = dateNow();
     _ncalls = 0;
     setTimeout(() => {
       _timestamp = null;
@@ -198,7 +199,9 @@ function isObject(item) {
 /**
  * Generate a random integer between two numbers
  * @returns {number}
+ * No point testing a random number generator as tests cannot be deterministic.
  */
+/* istanbul ignore next */
 function randomInt() {
   /* eslint no-bitwise:0 */
   return Math.floor(Math.random() * 0x100000000 | 0).toString(16);

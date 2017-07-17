@@ -1,5 +1,5 @@
-const RediBox = require('../../src/index').default;
-const { after } = require('../../src/index');
+const RediBox = require('../../index').default;
+const { after } = require('../../index');
 
 describe('core hooks - pubsub', () => {
   it('Should create a subscriber client if option set', (done) => {
