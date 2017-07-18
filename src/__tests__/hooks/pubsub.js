@@ -26,6 +26,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 
@@ -63,6 +64,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 
@@ -88,6 +90,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 
@@ -165,6 +168,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 

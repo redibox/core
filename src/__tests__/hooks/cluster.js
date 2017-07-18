@@ -43,6 +43,7 @@ describe('core hooks - cluster', () => {
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
@@ -62,6 +63,7 @@ describe('core hooks - cluster', () => {
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
@@ -81,11 +83,12 @@ describe('core hooks - cluster', () => {
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
 
-  it('Should return an array of all redis node addresses', function testB(done) {
+  it('Should return an array of all redis node addresses', (done) => {
     const redibox = new RediBox(clusterConfig, () => {
       expect(redibox.options.redis.cluster).toBe(true);
       expect(typeof redibox.clients.default.connectionPool.nodes.all).toBe('object');
@@ -105,6 +108,7 @@ describe('core hooks - cluster', () => {
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
@@ -118,6 +122,7 @@ describe('core hooks - cluster', () => {
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });

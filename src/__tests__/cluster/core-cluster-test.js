@@ -57,6 +57,7 @@ describe('cluster', () => {
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
