@@ -1,4 +1,4 @@
-const RediBox = require('../../index').default;
+const RediBox = require('../../').default;
 
 const clusterConfig = {
   log: { level: 'error' },

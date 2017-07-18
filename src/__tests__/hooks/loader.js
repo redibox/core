@@ -1,5 +1,5 @@
-const RediBox = require('../../index').default;
-const { BaseHook } = require('../../index');
+const RediBox = require('../../').default;
+const { BaseHook } = require('../../');
 
 class CoolHook extends BaseHook {
   constructor() {

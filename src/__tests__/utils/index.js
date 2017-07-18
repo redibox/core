@@ -15,7 +15,7 @@ const { loadPackageJSON,
   throttle,
   getTimeStamp,
   sha1sum,
-} = require('../../utils/index');
+} = require('../../utils/');
 
 const { dateNow, throwError } = require('../../utils/aliases');
 
