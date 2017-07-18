@@ -36,7 +36,7 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "prepublish": "npm run lint && npm run build",
     "lint": "eslint ./src",
-    "unit": "jest",
+    "unit": "jest --forceExit",
     "test": "jest --forceExit --coverage",
     "showcoverage": "http-server coverage -p 7000 -o"
   },
