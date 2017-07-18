@@ -1,5 +1,5 @@
-const RediBox = require('../../src/index').default;
-const { after } = require('../../src/index');
+const RediBox = require('../../').default;
+const { after } = require('../../');
 
 describe('core hooks - pubsub', () => {
   it('Should create a subscriber client if option set', (done) => {
@@ -26,6 +26,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 
@@ -63,6 +64,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 
@@ -88,6 +90,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 
@@ -165,6 +168,7 @@ describe('core hooks - pubsub', () => {
     const redibox = new RediBox({ pubsub: { subscriber: true, publisher: true } });
 
     redibox.on('error', (error) => {
+      // eslint-disable-next-line no-console
       console.dir(error);
     });
 

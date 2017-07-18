@@ -1,4 +1,4 @@
-const RediBox = require('../../src/index').default;
+const RediBox = require('../../').default;
 
 describe('core', () => {
   it('Should error when connecting to a offline redis server', (done) => {

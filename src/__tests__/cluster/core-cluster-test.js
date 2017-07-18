@@ -1,4 +1,4 @@
-const RediBox = require('../../src/index').default;
+const RediBox = require('../../').default;
 
 const clusterConfig = {
   log: { level: 'error' },
@@ -57,6 +57,7 @@ describe('cluster', () => {
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });

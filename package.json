@@ -37,7 +37,8 @@
     "prepublish": "npm run lint && npm run build",
     "lint": "eslint ./src",
     "unit": "jest --forceExit",
-    "test": "jest --forceExit --coverage"
+    "test": "jest --forceExit --coverage",
+    "showcoverage": "http-server coverage -p 7000 -o"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -53,6 +54,7 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0",
+    "http-server": "^0.10.0",
     "isparta": "^4.0.0",
     "jest": "^20.0.4"
   },
@@ -62,5 +64,14 @@
     "eventemitter3": "^2.0.3",
     "ioredis": "^2.3.0",
     "winston": "^2.3.1"
+  },
+  "jest": {
+    "rootDir": "./src",
+    "resetMocks": true,
+    "resetModules": true,
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/utils/aliases.js"
+    ]
   }
 }

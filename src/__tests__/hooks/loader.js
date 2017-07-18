@@ -1,5 +1,5 @@
-const RediBox = require('../../src/index').default;
-const { BaseHook } = require('../../src/index');
+const RediBox = require('../../').default;
+const { BaseHook } = require('../../');
 
 class CoolHook extends BaseHook {
   constructor() {
@@ -55,12 +55,14 @@ describe('core hooks - loader', () => {
         cool: CoolHook,
       },
     }, () => {
+      // eslint-disable-next-line no-prototype-builtins
       expect(redibox.hooks.hasOwnProperty('cool')).toBe(true);
       expect(redibox.hooks.cool.getClientCount()).toBe(1);
       redibox.disconnect();
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
@@ -71,12 +73,14 @@ describe('core hooks - loader', () => {
         cool: CoolHook,
       },
     }, () => {
+      // eslint-disable-next-line no-prototype-builtins
       expect(redibox.hooks.cool.options.hasOwnProperty('kittenSays')).toBe(true);
       expect(redibox.hooks.cool.options.kittenSays).toBe('meow');
       redibox.disconnect();
       done();
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
@@ -87,6 +91,7 @@ describe('core hooks - loader', () => {
         cool: CoolHook,
       },
     }, () => {
+      /* eslint-disable no-prototype-builtins */
       expect(redibox.hooks.hasOwnProperty('cool')).toBe(true);
       redibox.hooks.cool._unmount();
       expect(redibox.hooks.hasOwnProperty('cool')).toBe(false);
@@ -95,8 +100,10 @@ describe('core hooks - loader', () => {
       expect(redibox.hasOwnProperty('cluster')).toBe(false);
       redibox.disconnect();
       done();
+      /* eslint-enable */
     });
     redibox.on('error', (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
     });
   });
