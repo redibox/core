@@ -120,7 +120,7 @@ describe('utils', () => {
   describe('isFunction', () => {
     it('returns true if function', () => {
       expect(isFunction(jest.fn())).toBe(true);
-      expect(isFunction('no-a-function')).toBe(false);
+      expect(isFunction('not-a-function')).toBe(false);
     });
   });
 
