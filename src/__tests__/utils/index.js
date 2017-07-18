@@ -288,9 +288,9 @@ describe('utils', () => {
     });
 
     it('catches JSON stringify errors', () => {
-      const a = {};
-      a.b = a;
-      expect(tryJSONStringify(a)).toBeUndefined();
+      const badData = {};
+      badData.prop = badData;
+      expect(tryJSONStringify(badData)).toBeUndefined();
     });
   });
 
