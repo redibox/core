@@ -5,6 +5,7 @@ const { loadPackageJSON,
   mergeDeep,
   isObject,
   createLogger,
+  queueThrow,
   nodify,
   noop,
   isFunction,
@@ -16,7 +17,7 @@ const { loadPackageJSON,
   sha1sum,
 } = require('../../utils/index');
 
-const { dateNow } = require('../../utils/aliases');
+const { dateNow, throwError } = require('../../utils/aliases');
 
 jest.mock('../../utils/aliases');
 
@@ -136,26 +137,66 @@ describe('utils', () => {
     });
   });
 
+  describe('queueThrow', () => {
+    it('takes and throws an error within a setTimeout', (done) => {
+      throwError.mockImplementation(e => e);
+      const errorValue = 'test-error';
+      queueThrow(errorValue);
+      setTimeout(() => {
+        expect(throwError).toHaveBeenCalledWith(errorValue);
+        done();
+      }, 10);
+    });
+  });
+
   describe('nodify', () => {
     it('if no callback passed returns the promise', () => {
-      const testPromise = Promise.resolve('test success');
+      const testPromise = Promise.resolve();
       expect(nodify(testPromise)).toBe(testPromise);
     });
 
     it('calls the callback with resolved promise value', (done) => {
-      const testPromise = Promise.resolve('test success');
-      const callback = jest.fn();
-      nodify(testPromise, callback);
+      const successValue = 'success';
+      const testPromise = Promise.resolve(successValue);
+      const cb = jest.fn();
+      nodify(testPromise, cb);
       setTimeout(() => {
-        expect(callback).toHaveBeenCalledWith(null, 'test success');
+        expect(cb).toHaveBeenCalledWith(null, successValue);
         done();
       }, 20);
     });
 
-    it('handles errors', () => {
-      const testPromise = Promise.resolve('test success');
-      const callback = undefined
-      nodify(testPromise, callback);
+    it('handles errors in the callback, passing them to queueThrow', (done) => {
+      const testPromise = Promise.resolve();
+      const cb = true;
+      const qt = jest.fn();
+      nodify(testPromise, cb, qt);
+      setTimeout(() => {
+        expect(qt).toHaveBeenCalled();
+        done();
+      }, 20);
+    });
+
+    it('handles rejected promises calling the callback with the rejection', (done) => {
+      const rejectValue = 'promise-rejected';
+      const rejectedPromise = Promise.reject(rejectValue);
+      const cb = jest.fn();
+      nodify(rejectedPromise, cb);
+      setTimeout(() => {
+        expect(cb).toHaveBeenCalledWith(rejectValue);
+        done();
+      }, 20);
+    });
+
+    it('handles rejected promises and queueing errors thrown by the callback', (done) => {
+      const rejectedPromise = Promise.reject();
+      const cb = true;
+      const qt = jest.fn();
+      nodify(rejectedPromise, cb, qt);
+      setTimeout(() => {
+        expect(qt).toHaveBeenCalled();
+        done();
+      }, 20);
     });
   });
 
@@ -244,6 +285,12 @@ describe('utils', () => {
     it('returns a JSON representation of the data', () => {
       const validData = { valid: true };
       expect(tryJSONStringify(validData)).toEqual('{"valid":true}');
+    });
+
+    it('catches JSON stringify errors', () => {
+      const a = {};
+      a.b = a;
+      expect(tryJSONStringify(a)).toBeUndefined();
     });
   });
 

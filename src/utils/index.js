@@ -28,7 +28,7 @@ const { createHash } = require('crypto');
 const { sep, join, resolve } = require('path');
 const { Logger, transports } = require('winston');
 const { existsSync, readFileSync } = require('fs');
-const { dateNow } = require('./aliases');
+const { dateNow, throwError } = require('./aliases');
 
 /**
  * Generates from sha1 sum from an object.
@@ -149,25 +149,24 @@ function noop() {
  * @param callback
  * @returns {*}
  */
-function nodify(promise, callback) {
+const queueThrow = e =>
+  setTimeout(() =>
+    throwError(e), 0);
+
+function nodify(promise, callback, qt = queueThrow) {
   if (callback) {
     // prevent any callback exceptions getting swallowed by the Promise handlers
-    const queueThrow = (e) => {
-      setTimeout(() => {
-        throw e;
-      }, 0);
-    };
     promise.then((v) => {
       try {
         callback(null, v);
       } catch (e) {
-        queueThrow(e);
+        qt(e);
       }
     }).catch((r) => {
       try {
         callback(r);
       } catch (e) {
-        queueThrow(e);
+        qt(e);
       }
     });
   }
@@ -299,6 +298,7 @@ module.exports = {
   randomInt,
   isObject,
   createLogger,
+  queueThrow,
   nodify,
   noop,
   isFunction,
